@@ -1,0 +1,179 @@
+[
+    {
+        "name": "php-curl-class/php-curl-class",
+        "version": "7.4.0",
+        "version_normalized": "7.4.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-curl-class/php-curl-class.git",
+            "reference": "c15f23ce5d52a4c68b69640ed6510a9d2a98ec6f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-curl-class/php-curl-class/zipball/c15f23ce5d52a4c68b69640ed6510a9d2a98ec6f",
+            "reference": "c15f23ce5d52a4c68b69640ed6510a9d2a98ec6f",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": ">=5.3"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "*",
+            "squizlabs/php_codesniffer": "*"
+        },
+        "time": "2017-09-04T21:38:09+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Curl\\": "src/Curl/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Unlicense"
+        ],
+        "authors": [
+            {
+                "name": "Zach Borboa"
+            }
+        ],
+        "description": "PHP Curl Class makes it easy to send HTTP requests and integrate with web APIs.",
+        "homepage": "https://github.com/php-curl-class/php-curl-class",
+        "keywords": [
+            "api",
+            "class",
+            "client",
+            "curl",
+            "framework",
+            "http",
+            "http client",
+            "json",
+            "php",
+            "requests",
+            "rest",
+            "restful",
+            "web service",
+            "xml"
+        ]
+    },
+    {
+        "name": "doctrine/inflector",
+        "version": "v1.2.0",
+        "version_normalized": "1.2.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/doctrine/inflector.git",
+            "reference": "e11d84c6e018beedd929cff5220969a3c6d1d462"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/doctrine/inflector/zipball/e11d84c6e018beedd929cff5220969a3c6d1d462",
+            "reference": "e11d84c6e018beedd929cff5220969a3c6d1d462",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^7.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^6.2"
+        },
+        "time": "2017-07-22T12:18:28+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.2.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Doctrine\\Common\\Inflector\\": "lib/Doctrine/Common/Inflector"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Roman Borschel",
+                "email": "roman@code-factory.org"
+            },
+            {
+                "name": "Benjamin Eberlei",
+                "email": "kontakt@beberlei.de"
+            },
+            {
+                "name": "Guilherme Blanco",
+                "email": "guilhermeblanco@gmail.com"
+            },
+            {
+                "name": "Jonathan Wage",
+                "email": "jonwage@gmail.com"
+            },
+            {
+                "name": "Johannes Schmitt",
+                "email": "schmittjoh@gmail.com"
+            }
+        ],
+        "description": "Common String Manipulations with regard to casing and singular/plural rules.",
+        "homepage": "http://www.doctrine-project.org",
+        "keywords": [
+            "inflection",
+            "pluralize",
+            "singularize",
+            "string"
+        ]
+    },
+    {
+        "name": "paggi/sdk",
+        "version": "v1.2.1",
+        "version_normalized": "1.2.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/paggi-com/php-sdk.git",
+            "reference": "1fa59e7a1d542b35ed26006194ce7655c80d70af"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/paggi-com/php-sdk/zipball/1fa59e7a1d542b35ed26006194ce7655c80d70af",
+            "reference": "1fa59e7a1d542b35ed26006194ce7655c80d70af",
+            "shasum": ""
+        },
+        "require": {
+            "doctrine/inflector": "^1.2",
+            "php-curl-class/php-curl-class": "^7.3"
+        },
+        "time": "2017-09-05T19:54:51+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Paggi\\": "lib/",
+                "Paggi\\Traits\\": "lib/Traits"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Paggi IT Team",
+                "email": "it@paggi.com"
+            }
+        ],
+        "description": "Paggi PHP SDK",
+        "homepage": "https://docs.paggi.com",
+        "keywords": [
+            "pagamento brasil",
+            "pagamentos",
+            "paggi",
+            "paggi.com",
+            "payments",
+            "payments brazil"
+        ]
+    }
+]

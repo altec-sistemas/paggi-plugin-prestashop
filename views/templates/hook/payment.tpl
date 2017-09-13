@@ -1,5 +1,4 @@
-<?php
-/*
+{*
 * 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -22,14 +21,11 @@
 *  @copyright  2003-2017 Paggi
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*/
+*}
 
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
-
-header('Location: ../');
-exit;
+<p class="payment_module">
+	<a href="{$link->getModuleLink('paggi', 'payment')|escape:'html'}" title="{l s='Pay by bank wire' mod='paggi'}">
+		<img src="{$this_path_bw}{$this_img}" alt="{l s='Pay by Paggi' mod='paggi'}" width="86" height="49"/>
+		{l s='Pay by Paggi' mod='paggi'}&nbsp;<span>{l s='(order processing will be longer)' mod='paggi'}</span>
+	</a>
+</p>
