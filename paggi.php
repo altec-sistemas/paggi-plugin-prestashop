@@ -1,43 +1,63 @@
 <?php
-/*
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author Paggi <contact@paggi.com>
-*  @copyright  2003-2017 Paggi
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
+
+/**
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @category  PaymentModule
+ * @package   Module
+ * @author    Paggi <contact@paggi.com>
+ * @copyright 2003-2017 Paggi
+ * @license   http://opensource.org/licenses/afl-3.0.php 
+ *            Academic Free License (AFL 3.0)
+ * @link      https://github.com/paggi-com/plugin-prestashop.git
+ * International Registered Trademark & Property of PrestaShop SA
+ */
+
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class Paggi
+ *
+ * @category PaymentModule
+ * @package  Module
+ * @author   Paggi <contact@paggi.com>
+ * @license  http://opensource.org/licenses/afl-3.0.php 
+ *           Academic Free License (AFL 3.0)
+ * @link     https://github.com/paggi-com/plugin-prestashop.git
+ */
+
 class Paggi extends PaymentModule
 {
-    protected $_html = '';
+    protected $html = '';
 
-    protected $_postErrors = array();
+    protected $postErrors = array();
 
-    protected $_env = 0;
+    protected $env = 0;
 
-    protected $_key = '';
+    protected $key = '';
 
+    /**
+     * This method constructor.
+     */
     public function __construct()
     {
         $this->name = 'paggi';
@@ -55,18 +75,23 @@ class Paggi extends PaymentModule
         $this->bootstrap = true;
 
         //load variables
-        $config = Configuration::getMultiple(array('PAGGI_API_KEY_PRODUCTION', 'PAGGI_API_KEY_TEST', 'PAGGI_ENVIRONMENT'));
+        $config = Configuration::getMultiple(
+            array(
+                'PAGGI_API_KEY_PRODUCTION', 
+                'PAGGI_API_KEY_TEST', 
+                'PAGGI_ENVIRONMENT')
+        );
         if (!empty($config['PAGGI_ENVIRONMENT'])) {
-            $this->_env = $config['PAGGI_ENVIRONMENT'];
+            $this->env = $config['PAGGI_ENVIRONMENT'];
         }
 
-        if (!$this->_env) {
+        if (!$this->env) {
             if (!empty($config['PAGGI_API_KEY_TEST'])) {
-                $this->_key = $config['PAGGI_API_KEY_TEST'];
+                $this->key = $config['PAGGI_API_KEY_TEST'];
             }
         } else {
             if (!empty($config['PAGGI_API_KEY_PRODUCTION'])) {
-                $this->_key = $config['PAGGI_API_KEY_PRODUCTION'];
+                $this->key = $config['PAGGI_API_KEY_PRODUCTION'];
             }
         }
 
@@ -81,32 +106,27 @@ class Paggi extends PaymentModule
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
         //warning access envirement test
-        if (!$this->_env) {
+        if (!$this->env) {
             $this->adminDisplayWarning($this->l('You are in a test environment this module.'));
         }
 
-        if (empty($this->_key)) {
+        if (empty($this->key)) {
             $this->warning = $this->l('Api Key must be configured to use this module.');
         }
     }
 
+    /**
+     * Install process
+     *
+     * @see    PaymentModule::install()
+     * @return bool
+     */
     public function install()
     {
-        if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn')) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function uninstall()
-    {
-        if (!parent::uninstall()
-            || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
-            || !Configuration::deleteByName('PAGGI_API_KEY_TEST')
-            || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
-            || !Configuration::deleteByName('PAGGI_IMG')
-            ) {
+        if (!parent::install() 
+            || !$this->registerHook('payment') 
+            || !$this->registerHook('paymentReturn')
+        ) {
             return false;
         }
 
@@ -114,7 +134,32 @@ class Paggi extends PaymentModule
     }
 
     /**
-     * @since 1.6.x.
+     * Uninstall process
+     *
+     * @see    PaymentModule::uninstall()
+     * @return bool
+     */
+    public function uninstall()
+    {
+        if (!parent::uninstall()
+            || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
+            || !Configuration::deleteByName('PAGGI_API_KEY_TEST')
+            || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
+            || !Configuration::deleteByName('PAGGI_IMG')
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * To display the payment method.
+     *
+     * @param Object $params dataParams
+     *
+     * @see    http://doc.prestashop.com/display/PS16/Creating+a+payment+module
+     * @return PaymentModule::display()
      */
     public function hookPayment($params)
     {
@@ -124,17 +169,27 @@ class Paggi extends PaymentModule
         if (!$this->checkCurrency($params['cart'])) {
             return;
         }
-
-        $this->smarty->assign(array(
-            'this_path' => $this->_path,
-            'this_path_bw' => $this->_path,
-            'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/',
-            'this_img' => $this->getPaggiImage(),
-        ));
+        $this_path_ssl = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/';
+        $this->smarty->assign( 
+            array(
+                'this_path' => $this->_path,
+                'this_path_bw' => $this->_path,
+                'this_path_ssl' => $this_path_ssl,
+                'this_img' => $this->getPaggiImage(),
+            )
+        );
 
         return $this->display(__FILE__, 'payment.tpl');
     }
 
+    /**
+     * To display the payment confirmation.
+     *
+     * @param Object $params dataParams
+     *
+     * @see    http://doc.prestashop.com/display/PS16/Creating+a+payment+module
+     * @return PaymentModule::display()
+     */
     public function hookPaymentReturn($params)
     {
         if (!$this->active) {
@@ -150,6 +205,14 @@ class Paggi extends PaymentModule
         return $this->display(__FILE__, 'payment_return.tpl');
     }
 
+
+    /**
+     * Check permission Currency.
+     *
+     * @param Cart $cart ClassCart
+     *
+     * @return bool
+     */
     public function checkCurrency($cart)
     {
         $currency_order = new Currency((int) ($cart->id_currency));
@@ -166,13 +229,20 @@ class Paggi extends PaymentModule
         return false;
     }
 
-    protected function _uploadImg()
+
+    /**
+     * Responsible for uploading Paggi Image
+     *
+     * @return void
+     */
+    protected function uploadImg()
     {
         $update_images_values = false;
 
         if (isset($_FILES['PAGGI_IMG'])
-                    && isset($_FILES['PAGGI_IMG']['tmp_name'])
-                    && !empty($_FILES['PAGGI_IMG']['tmp_name'])) {
+            && isset($_FILES['PAGGI_IMG']['tmp_name'])
+            && !empty($_FILES['PAGGI_IMG']['tmp_name'])
+        ) {
             if ($error = ImageManager::validateUpload($_FILES['PAGGI_IMG'], 4000000)) {
                 return $error;
             } else {
@@ -183,7 +253,8 @@ class Paggi extends PaymentModule
                     return $this->displayError($this->l('An error occurred while attempting to upload the file.'));
                 } else {
                     if (Configuration::hasContext('PAGGI_IMG', null, Shop::getContext())
-                                && Configuration::get('PAGGI_IMG') != $file_name) {
+                        && Configuration::get('PAGGI_IMG') != $file_name
+                    ) {
                         @unlink(dirname(__FILE__).DIRECTORY_SEPARATOR.Configuration::get('PAGGI_IMG'));
                     }
 
@@ -199,18 +270,28 @@ class Paggi extends PaymentModule
         }
     }
 
-    protected function _postProcess()
+    /**
+     * Executing in method post
+     *
+     * @return void
+     */
+    protected function postProcess()
     {
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
             Configuration::updateValue('PAGGI_API_KEY_TEST', Tools::getValue('PAGGI_API_KEY_TEST'));
             Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
 
-            $this->_uploadImg();
+            $this->uploadImg();
         }
-        $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
+        $this->html .= $this->displayConfirmation($this->l('Settings updated'));
     }
 
+    /**
+     * Get Paggi Image Default or New
+     *
+     * @return string
+     */
     public function getPaggiImage()
     {
         $image = empty(Configuration::get('PAGGI_IMG')) ? 'logo.png' : Configuration::get('PAGGI_IMG');
@@ -221,19 +302,29 @@ class Paggi extends PaymentModule
         return $image;
     }
 
+    /**
+     * Display administration form
+     *
+     * @return HelperForm
+     */
     public function getContent()
     {
         if (Tools::isSubmit('btnSubmit')) {
-            $this->_postProcess();
+            $this->postProcess();
         } else {
-            $this->_html .= '<br />';
+            $this->html .= '<br />';
         }
 
-        $this->_html .= $this->renderForm();
+        $this->html .= $this->renderForm();
 
-        return $this->_html;
+        return $this->html;
     }
 
+    /**
+     * Prepare Context HelperForm
+     *
+     * @return HelperForm
+     */
     public function renderForm()
     {
         //prepare view paggi image temp
@@ -329,6 +420,11 @@ class Paggi extends PaymentModule
         return $helper->generateForm(array($fields_form_configuration));
     }
 
+    /**
+     * Load Configuration Variables
+     *
+     * @return Array
+     */
     public function getConfigFieldsValues()
     {
         return array(
