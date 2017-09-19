@@ -23,7 +23,7 @@
  * @package   Module
  * @author    Paggi <contact@paggi.com>
  * @copyright 2003-2017 Paggi
- * @license   http://opensource.org/licenses/afl-3.0.php 
+ * @license   http://opensource.org/licenses/afl-3.0.php
  *            Academic Free License (AFL 3.0)
  * @link      https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA
@@ -40,7 +40,7 @@ if (!defined('_PS_VERSION_')) {
  * @category PaymentModule
  * @package  Module
  * @author   Paggi <contact@paggi.com>
- * @license  http://opensource.org/licenses/afl-3.0.php 
+ * @license  http://opensource.org/licenses/afl-3.0.php
  *           Academic Free License (AFL 3.0)
  * @link     https://github.com/paggi-com/plugin-prestashop.git
  */
@@ -60,13 +60,17 @@ class Paggi extends PaymentModule
      */
     public function __construct()
     {
+
+        //load Class
+        require_once __DIR__.'/classes/PaggiCustomer.php';
+
         $this->name = 'paggi';
 
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'PrestaShop';
 
-        $this->controllers = array('payment', 'validation');
+        $this->controllers = array('payment', 'validation', 'card');
 
         $this->currencies = true;
         $this->is_eu_compatible = 1;
@@ -74,11 +78,12 @@ class Paggi extends PaymentModule
         $this->currencies_mode = 'checkbox';
         $this->bootstrap = true;
 
+
         //load variables
         $config = Configuration::getMultiple(
             array(
-                'PAGGI_API_KEY_PRODUCTION', 
-                'PAGGI_API_KEY_TEST', 
+                'PAGGI_API_KEY_PRODUCTION',
+                'PAGGI_API_KEY_TEST',
                 'PAGGI_ENVIRONMENT')
         );
         if (!empty($config['PAGGI_ENVIRONMENT'])) {
@@ -88,10 +93,12 @@ class Paggi extends PaymentModule
         if (!$this->env) {
             if (!empty($config['PAGGI_API_KEY_TEST'])) {
                 $this->key = $config['PAGGI_API_KEY_TEST'];
+                \Paggi\Paggi::setStaging(true);
             }
         } else {
             if (!empty($config['PAGGI_API_KEY_PRODUCTION'])) {
                 $this->key = $config['PAGGI_API_KEY_PRODUCTION'];
+                \Paggi\Paggi::setStaging(false);
             }
         }
 
@@ -113,6 +120,9 @@ class Paggi extends PaymentModule
         if (empty($this->key)) {
             $this->warning = $this->l('Api Key must be configured to use this module.');
         }
+
+        //set init Api Key
+        \Paggi\Paggi::setApiKey($this->key);
     }
 
     /**
@@ -123,9 +133,10 @@ class Paggi extends PaymentModule
      */
     public function install()
     {
-        if (!parent::install() 
-            || !$this->registerHook('payment') 
+        if (!parent::install()
+            || !$this->registerHook('payment')
             || !$this->registerHook('paymentReturn')
+            || !PaggiCustommer::createTable()
         ) {
             return false;
         }
@@ -142,6 +153,7 @@ class Paggi extends PaymentModule
     public function uninstall()
     {
         if (!parent::uninstall()
+            || !PaggiCustommer::dropTable()
             || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
             || !Configuration::deleteByName('PAGGI_API_KEY_TEST')
             || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
@@ -170,7 +182,7 @@ class Paggi extends PaymentModule
             return;
         }
         $this_path_ssl = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/';
-        $this->smarty->assign( 
+        $this->smarty->assign(
             array(
                 'this_path' => $this->_path,
                 'this_path_bw' => $this->_path,
@@ -227,6 +239,43 @@ class Paggi extends PaymentModule
         }
 
         return false;
+    }
+
+    /**
+     * Calculate Installments
+     *
+     * @param Float $amount
+     *
+     * @return Array
+     */
+    public function getPaymentInstallments($amount)
+    {
+        $select = array();
+
+        $free_installments = empty(Configuration::get("PAGGI_FREE_INSTALLMENTS")) ? 1 : Configuration::get("PAGGI_FREE_INSTALLMENTS");
+        $max_installments =  empty(Configuration::get("PAGGI_MAX_INSTALLMENTS")) ? 12 : Configuration::get("PAGGI_MAX_INSTALLMENTS");
+        $interest_rate =  empty(Configuration::get("PAGGI_INTEREST_RATE")) ? 0 : Configuration::get("PAGGI_INTEREST_RATE");
+
+        for ($x = 1; $x <= $max_installments; $x++) {
+            if ($x > $free_installments) {
+                $amount_new = ($amount * $x * $interest_rate / 100) + $amount;
+            } else {
+                $amount_new = $amount;
+            }
+
+            $installment_amount =  $amount_new / $x;
+
+            $option = array(
+            "installment" => $x,
+            "total" => $amount_new,
+            "installment_amount"=> $installment_amount
+          );
+
+            array_push($select, $option);
+        }
+
+
+        return $select;
     }
 
 

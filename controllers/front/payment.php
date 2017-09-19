@@ -22,7 +22,7 @@
  * @package     Module
  * @author      Paggi <contact@paggi.com>
  * @copyright   2003-2017 Paggi
- * @license     http://opensource.org/licenses/afl-3.0.php 
+ * @license     http://opensource.org/licenses/afl-3.0.php
  *              Academic Free License (AFL 3.0)
  * @link        https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA
@@ -38,13 +38,15 @@ if (!defined('_PS_VERSION_')) {
  * @category ModuleFrontController
  * @package  Module
  * @author   Paggi <contact@paggi.com>
- * @license  http://opensource.org/licenses/afl-3.0.php 
+ * @license  http://opensource.org/licenses/afl-3.0.php
  *           Academic Free License (AFL 3.0)
  * @link     https://github.com/paggi-com/plugin-prestashop.git
  */
 
 class PaggiPaymentModuleFrontController extends ModuleFrontController
 {
+    protected $paggiCustomer;
+
     /**
      * Init Content Display Payment
      *
@@ -59,12 +61,25 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
         if (!$this->module->checkCurrency($cart)) {
             Tools::redirect('index.php?controller=order');
         }
+
+        $customer = new Customer($cart->id_customer);
+        if (!Validate::isLoadedObject($customer)) {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
+
+        $this->paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
       
-        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/card.js');
-        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/jquery.card.js');
         
+        $this->displayChooseCard();
+    }
+
+
+    protected function displayChooseCard()
+    {
+        $cart = $this->context->cart;
         //passed data as parameter to the template
         $this->context->smarty->assign(array(
+            'paggiCustomer' => $this->paggiCustomer,
             'nbProducts' => $cart->nbProducts(),
             'cust_currency' => $cart->id_currency,
             'currencies' => $this->module->getCurrency((int) $cart->id_currency),
@@ -73,8 +88,9 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
             'this_path_bw' => $this->module->getPathUri(),
             'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->module->name.'/',
             'this_img' => $this->module->getPaggiImage(),
+            'select_sales'=> $this->module->getPaymentInstallments($cart->getOrderTotal(true, Cart::BOTH))
         ));
 
-        $this->setTemplate('payment_execution.tpl');
+        $this->setTemplate('choose_card.tpl');
     }
 }

@@ -1,51 +1,10 @@
-{*
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author Paggi <contact@paggi.com>
-*  @copyright  2003-2017 Paggi
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*}
-
-
-
-{capture name=path}
-	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='paggi'}">{l s='Checkout' mod='paggi'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Paggi payment' mod='paggi'}
-{/capture}
-
-<h2>{l s='Order summary' mod='paggi'}</h2>
-
-{assign var='current_step' value='payment'}
-{include file="$tpl_dir./order-steps.tpl"}
-
-{if $nbProducts <= 0}
-	<p class="warning">{l s='Your shopping cart is empty.' mod='paggi'}</p>
-{else}
-
-
 <div class="box">
 	
-	<form class="paggi" action="{$link->getModuleLink('paggi', 'validation', [], true)|escape:'html'}" method="post"  >
+	<form class="paggi" action="{$link->getModuleLink('paggi', 'card', [], true)|escape:'html'}" method="post"  >
 		<div class="row">
 
 			<div class="col-xs-12 col-sm-6">
-				<h3 class="page-subheading">{l s='Paggi payment' mod='paggi'}</h3>
+				<h3 class="page-subheading">{l s='Add Card Paggi payment' mod='paggi'}</h3>
 
 				
 				<div class="form_content clearfix">				
@@ -64,13 +23,13 @@
 										<span class="input-group-addon" 
 										>
 
-											<span id="flag-hide" class="icon icon-credit-card" aria-hidden="true"></span>
-											<img id="flag" src="{$this_path_ssl}images/null.png" width="33px" />
+											<span class="icon icon-credit-card" aria-hidden="true"></span>
+											
 
 
 										</span>
 								<input type="text" 
-								placeholder="**** **** **** ****" 
+								placeholder="•••• •••• •••• ••••" 
 								id="card_number"
 								class="is_required validate form-control" name="PAGGI_CARD_NUMBER" />
 								</div>
@@ -86,7 +45,7 @@
 											<span class="icon icon-calendar" aria-hidden="true"></span>
 										</span>
 										<input type="text" id="expiration" 
-										placeholder="00/0000" 
+										placeholder="•• / ••••" 
 										size="7" 
 										class="is_required validate form-control" name="PAGGI_CARD_EXPIRATE" />
 								</div>
@@ -98,7 +57,22 @@
 
 					</div>
 
-				
+					<div class="row">
+						<div class="col-xs-12 col-sm-12">
+							<div class="form-group">
+								<label for="cardalias_name">{l s='Card Alias'}</label>
+								<div class="input-group">
+												<span class="input-group-addon">
+													<span class="icon icon-cog" aria-hidden="true"></span>
+												</span>
+								<input type="text" id="cardalias_name"
+								class="is_required validate form-control" name="PAGGI_CARD_ALIAS" />
+								</div>
+							</div>
+						</div>						
+
+					</div>
+
 
 
 					<div class="row">
@@ -133,7 +107,7 @@
 								<label for="cvc">{l s='CVC'}</label>
 								<div class="input-group">
 									<input type="text" 
-									placeholder="0000" 
+									placeholder="•••" 
 									id="cvc"
 									class="is_required validate form-control" name="PAGGI_CARD_CVC" />
 									<span class="input-group-addon">
@@ -145,27 +119,7 @@
 						</div>					
 
 					</div>
-					<div class="row">
-						
-
-						<div class="col-xs-12 col-sm-8">
-							<div class="form-group">
-								<label for="installments">{l s='Number of installments'}</label>
-								<select id="installments" 
-								class="form-control" 
-								name="PAGGI_NUMBER_INSTALLMENT" >
-									<option value="1">In cash</option>
-									<option value="2">1x</option>
-									<option value="3">1x</option>
-									<option value="4">1x</option>
-									
-								</select>
-								
-							</div>
-						</div>
-							
-
-					</div>
+					
 					
 
 					
@@ -192,9 +146,14 @@
 			<div class="col-xs-12 col-sm-12">
 				<div class="submit">
 
-					<button class="btn btn-default button button-medium exclusive" type="submit">
+					<button 
+					class="btn btn-success button button-medium exclusive" 
+					type="submit" 
+					name="PAGGI_TASK_CARD" 
+					value="PAGGI_OK"
+					>
 						<span>
-							{l s='I confirm my order' mod='paggi'}
+							{l s='Add Card' mod='paggi'}
 						</span>
 					</button>
 
@@ -210,28 +169,6 @@
 	</form>
 	
 </div>
-
-<style type="text/css">
-	
-<!--
-.card_number #flag{
-	display: none;
-}
-.card_number.showFlag .input-group-addon{
-	padding: 0;
-}
-.card_number.showFlag #flag{
-	display: block;
-}
-
-.card_number.showFlag #flag-hide{
-	display: none;
-}
-
--->
-
-</style>
-
 
 <script type="text/javascript">
     var mask_name = "{l s='Full Name'}";
@@ -268,6 +205,3 @@
 
     {/literal}
 </script>
-
-
-{/if}

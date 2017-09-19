@@ -18,7 +18,7 @@ trait Util
      *
      * @throws PaggiException Exception
      */
-    protected function manageResponse($responseCurl)
+    protected static function manageResponse($responseCurl)
     {
         $reflectedClass = get_called_class();
         $responseBody = $responseCurl->response;
@@ -54,7 +54,7 @@ trait Util
      *
      * @return array Array error
      */
-    protected function _getError($responseCurl)
+    protected static function _getError($responseCurl)
     {
         //The original message error from API
         $originalError = json_decode($responseCurl->rawResponse, true);
