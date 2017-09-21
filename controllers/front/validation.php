@@ -32,5 +32,60 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         parent::postProcess();
+
+        if (! Tools::isSubmit('PAGGI_TASK') ){
+            return false;
+        }
+
+        $cart = $this->context->cart;
+        if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
+
+        // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
+        $authorized = false;
+        foreach (Module::getPaymentModules() as $module) {
+            if ($module['name'] == 'paggi') {
+                $authorized = true;
+                break;
+            }
+        }
+        if (!$authorized) {
+            die($this->module->l('This payment method is not available.', 'validation'));
+        }
+
+        $customer = new Customer($cart->id_customer);
+
+        if (!Validate::isLoadedObject($customer)) {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
+        
+
+        $card_id = Tools::getValue('PAGGI_CHOOSE_CARD_ID');
+        $installments_number = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
+
+
+        $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
+
+      
+        $price = $cart->getOrderTotal(true, Cart::BOTH) * 100;
+
+        //params create card
+        $params = array(
+			'card_id' => $card_id,
+			'amount' => $price,
+			'risk_analysis' => true,
+			'installments_number' =>  $installments_number,
+			'force' => true
+        );
+
+        $charge = \Paggi\Charge::create($params);
+
+        $status = Configuration::getGlobalValue('PAGGI_STATUS_'.strtoupper($charge->status));
+
+
+		$this->module->validateOrder((int)$cart->id, $status, $total, $this->module->displayName, NULL, array(), (int)$currency->id, false, $customer->secure_key);
+		
+		Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
     }
 }
