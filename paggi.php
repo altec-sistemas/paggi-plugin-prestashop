@@ -330,6 +330,16 @@ class Paggi extends PaymentModule
             Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
             Configuration::updateValue('PAGGI_API_KEY_TEST', Tools::getValue('PAGGI_API_KEY_TEST'));
             Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
+            Configuration::updateValue('PAGGI_STATUS_APPROVED' , Tools::getValue('PAGGI_STATUS_APPROVED' ));
+            Configuration::updateValue('PAGGI_STATUS_DECLINED' , Tools::getValue('PAGGI_STATUS_DECLINED' ));
+            Configuration::updateValue('PAGGI_STATUS_REGISTERED', Tools::getValue('PAGGI_STATUS_REGISTERED'));
+            Configuration::updateValue('PAGGI_STATUS_PRE_APPROVED', Tools::getValue('PAGGI_STATUS_PRE_APPROVED'));
+            Configuration::updateValue('PAGGI_STATUS_CLEARED', Tools::getValue('PAGGI_STATUS_CLEARED'));
+            Configuration::updateValue('PAGGI_STATUS_NOT_CLEARED' , Tools::getValue('PAGGI_STATUS_NOT_CLEARED' ));
+            Configuration::updateValue('PAGGI_STATUS_MANUAL_CLEARED', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARED'));
+            Configuration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
+            Configuration::updateValue('PAGGI_STATUS_CAPTURED' , Tools::getValue('PAGGI_STATUS_CAPTURED' ));
+            Configuration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
 
             $this->uploadImg();
         }
@@ -376,6 +386,9 @@ class Paggi extends PaymentModule
      */
     public function renderForm()
     {
+
+        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
+
         //prepare view paggi image temp
         $image_file = $this->getPaggiImage();
         $ext = substr($image_file, strrpos($image_file, '.') + 1);
@@ -448,10 +461,18 @@ class Paggi extends PaymentModule
             ),
         );
 
+
+       
+
+        //load status prestashop
+        $options_status = OrderState::getOrderStates($lang->id);
+
+        $fields_form_status = $this->getFieldsFormStatus($options_status);
+        
         $helper = new HelperForm();
         $helper->show_toolbar = true;
         $helper->table = $this->table;
-        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
+       
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
         $this->fields_form = array();
@@ -466,7 +487,7 @@ class Paggi extends PaymentModule
             'id_language' => $this->context->language->id,
         );
 
-        return $helper->generateForm(array($fields_form_configuration));
+        return $helper->generateForm(array($fields_form_configuration, $fields_form_status));
     }
 
     /**
@@ -477,10 +498,159 @@ class Paggi extends PaymentModule
     public function getConfigFieldsValues()
     {
         return array(
-            'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
-            'PAGGI_API_KEY_TEST' => Tools::getValue('PAGGI_API_KEY_TEST', Configuration::get('PAGGI_API_KEY_TEST')),
-            'PAGGI_ENVIRONMENT' => Tools::getValue('PAGGI_ENVIRONMENT', Configuration::get('PAGGI_ENVIRONMENT')),
-            'PAGGI_IMG' => Tools::getValue('PAGGI_IMG', Configuration::get('PAGGI_IMG')),
+          'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
+          'PAGGI_API_KEY_TEST' => Tools::getValue('PAGGI_API_KEY_TEST', Configuration::get('PAGGI_API_KEY_TEST')),
+          'PAGGI_ENVIRONMENT' => Tools::getValue('PAGGI_ENVIRONMENT', Configuration::get('PAGGI_ENVIRONMENT')),
+          'PAGGI_IMG' => Tools::getValue('PAGGI_IMG', Configuration::get('PAGGI_IMG')),
+          'PAGGI_STATUS_APPROVED' => Tools::getValue('PAGGI_STATUS_APPROVED', Configuration::get('PAGGI_STATUS_APPROVED')),
+          'PAGGI_STATUS_DECLINED' => Tools::getValue('PAGGI_STATUS_DECLINED', Configuration::get('PAGGI_STATUS_DECLINED')),
+          'PAGGI_STATUS_REGISTERED' => Tools::getValue('PAGGI_STATUS_REGISTERED', Configuration::get('PAGGI_STATUS_REGISTERED')),
+          'PAGGI_STATUS_PRE_APPROVED' => Tools::getValue('PAGGI_STATUS_PRE_APPROVED', Configuration::get('PAGGI_STATUS_PRE_APPROVED')),
+          'PAGGI_STATUS_CLEARED' => Tools::getValue('PAGGI_STATUS_CLEARED', Configuration::get('PAGGI_STATUS_CLEARED')),
+          'PAGGI_STATUS_NOT_CLEARED' => Tools::getValue('PAGGI_STATUS_NOT_CLEARED', Configuration::get('PAGGI_STATUS_NOT_CLEARED')),
+          'PAGGI_STATUS_MANUAL_CLEARED' => Tools::getValue('PAGGI_STATUS_MANUAL_CLEARED', Configuration::get('PAGGI_STATUS_MANUAL_CLEARED')),
+          'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
+          'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
+          'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK'))
         );
+    }
+
+
+
+    public function getFieldsFormStatus($options_status){
+       $fields_form_status = array(
+           'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Transaction status'),
+                    'icon' => 'icon-cog',
+                ),
+                'input' => array(
+                   
+                   array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Approved:'),         
+                      'desc' => $this->l('Charge captured for acquirer'),  
+                      'name' => 'PAGGI_STATUS_APPROVED',
+                      'options' => array(
+                        'query' => $options_status,                       
+                        'id' => 'id_order_state',                           
+                        'name' => 'name'                           
+                      )
+                    ),
+
+                   array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Declined:'),         
+                      'desc' => $this->l('Charge declined for acquirer'),  
+                       'name' => 'PAGGI_STATUS_DECLINED',  
+                       'options' => array(         
+                        'query' => $options_status,                         
+                        'id' => 'id_order_state',                           
+                        'name' => 'name'                              
+                      )
+                    ),
+                   array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Registered:'),         
+                      'desc' => $this->l('Charge registered but not captured'),
+                      'name' => 'PAGGI_STATUS_REGISTERED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+                    array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Pre Approved:'),         
+                      'desc' => $this->l('Pre-authorization created in acquirer'),
+                      'name' => 'PAGGI_STATUS_PRE_APPROVED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+
+                    array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Cleared:'),         
+                      'desc' => $this->l('Charge passing from the risk analysis'),
+                      'name' => 'PAGGI_STATUS_CLEARED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+
+                    array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Not Cleared:'),         
+                      'desc' => $this->l('Charge declined from risk analysis'),
+                      'name' => 'PAGGI_STATUS_NOT_CLEARED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+
+                     array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Manual Cleared:'),         
+                      'desc' => $this->l('Charge should be manually reviewed'),
+                      'name' => 'PAGGI_STATUS_MANUAL_CLEARED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+
+
+                     array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Captured:'),         
+                      'desc' => $this->l('Pre-authorization captured in acquirer'),
+                      'name' => 'PAGGI_STATUS_CAPTURED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+
+                    array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Cancelled:'),         
+                      'desc' => $this->l('Charge cancelled'),
+                      'name' => 'PAGGI_STATUS_CAPTURED',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+
+                    array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Chargeback:'),         
+                      'desc' => $this->l('Chargeback from customer or bank'),
+                      'name' => 'PAGGI_STATUS_CHARGEBACK',
+                      'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
+                      )
+                    ),
+                   ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                )
+            )
+        );
+
+        return $fields_form_status;
     }
 }
