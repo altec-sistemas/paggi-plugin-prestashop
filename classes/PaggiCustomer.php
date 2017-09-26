@@ -111,7 +111,9 @@ class PaggiCustomer extends ObjectModel
      * @return Json
      */
     public static function getLoadByCustomerPS($customer)
-    {
+    {   
+
+        $field_document = Configuration::get('PAGGI_DOCUMENT_FIELD');
 
         //select data paggiCustomer
         $sql = 'SELECT * FROM `'._DB_PREFIX_.'paggi_customer` 
@@ -123,7 +125,7 @@ class PaggiCustomer extends ObjectModel
             $params = array(
                 'name' =>$customer->firstname.' '.$customer->lastname,
                 'email' => $customer->email,
-                'document' =>'00000000000'
+                'document' =>$customer->$field_document
             );
 
             $customer_paggi = \Paggi\Customer::create($params);

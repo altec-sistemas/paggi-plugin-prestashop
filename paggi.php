@@ -53,7 +53,7 @@ class Paggi extends PaymentModule
 
     protected $env = 0;
 
-    protected $key = '';
+    public $key = '';
 
     /**
      * This method constructor.
@@ -330,6 +330,7 @@ class Paggi extends PaymentModule
     {
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
+            Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
             Configuration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
             Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
             Configuration::updateValue('PAGGI_STATUS_APPROVED' , Tools::getValue('PAGGI_STATUS_APPROVED' ));
@@ -465,7 +466,7 @@ class Paggi extends PaymentModule
 
         $fields_form_installments = $this->getFieldsFormInstallments();
 
-       
+        $fields_form_field_mapping = $this->getFieldsFormFieldMapping();
 
         //load status prestashop
         $options_status = OrderState::getOrderStates($lang->id);
@@ -490,7 +491,7 @@ class Paggi extends PaymentModule
             'id_language' => $this->context->language->id,
         );
 
-        return $helper->generateForm(array($fields_form_configuration,$fields_form_installments, $fields_form_status));
+        return $helper->generateForm(array($fields_form_configuration,$fields_form_installments, $fields_form_status, $fields_form_field_mapping));
     }
 
     /**
@@ -502,7 +503,8 @@ class Paggi extends PaymentModule
     {
         return array(
 
-          'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
+          'PAGGI_DOCUMENT_FIELD' => Tools::getValue('PAGGI_DOCUMENT_FIELD', Configuration::get('PAGGI_DOCUMENT_FIELD')),
+           'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
           'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
           'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
           'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
@@ -694,6 +696,34 @@ class Paggi extends PaymentModule
                       'name' => 'PAGGI_INTEREST_RATE'
                      
                     )
+                   
+                   ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                )
+            )
+        );
+
+        return $fields_form_status;
+    }
+
+
+    public function getFieldsFormFieldMapping(){
+    
+
+       $fields_form_status = array(
+           'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Field Mapping'),
+                    'icon' => 'icon-cog',
+                ),
+                'input' => array(
+                   
+                   array(
+                      'type' => 'text',                              
+                      'label' => $this->l('Document Field:'),
+                      'name' => 'PAGGI_DOCUMENT_FIELD'                     
+                    ),                
                    
                    ),
                 'submit' => array(
