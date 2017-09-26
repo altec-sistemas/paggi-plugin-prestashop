@@ -119,10 +119,12 @@ class Paggi extends PaymentModule
 
         if (empty($this->key)) {
             $this->warning = $this->l('Api Key must be configured to use this module.');
+        }else{
+           //set init Api Key
+            \Paggi\Paggi::setApiKey($this->key);
         }
 
-        //set init Api Key
-        \Paggi\Paggi::setApiKey($this->key);
+       
     }
 
     /**
