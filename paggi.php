@@ -463,6 +463,7 @@ class Paggi extends PaymentModule
             ),
         );
 
+        $fields_form_installments = $this->getFieldsFormInstallments();
 
        
 
@@ -489,7 +490,7 @@ class Paggi extends PaymentModule
             'id_language' => $this->context->language->id,
         );
 
-        return $helper->generateForm(array($fields_form_configuration, $fields_form_status));
+        return $helper->generateForm(array($fields_form_configuration,$fields_form_installments, $fields_form_status));
     }
 
     /**
@@ -500,6 +501,10 @@ class Paggi extends PaymentModule
     public function getConfigFieldsValues()
     {
         return array(
+
+          'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
+          'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
+          'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
           'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
           'PAGGI_API_KEY_TEST' => Tools::getValue('PAGGI_API_KEY_TEST', Configuration::get('PAGGI_API_KEY_TEST')),
           'PAGGI_ENVIRONMENT' => Tools::getValue('PAGGI_ENVIRONMENT', Configuration::get('PAGGI_ENVIRONMENT')),
@@ -646,6 +651,50 @@ class Paggi extends PaymentModule
                         'name' => 'name'
                       )
                     ),
+                   ),
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                )
+            )
+        );
+
+        return $fields_form_status;
+    }
+
+
+    public function getFieldsFormInstallments(){
+    
+
+       $fields_form_status = array(
+           'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Installment Settings'),
+                    'icon' => 'icon-cog',
+                ),
+                'input' => array(
+                   
+                   array(
+                      'type' => 'text',                              
+                      'label' => $this->l('Free Installment:'),         
+                      'desc' => $this->l('Number of interest-free installments'),  
+                      'name' => 'PAGGI_FREE_INSTALLMENTS'                     
+                    ),
+
+                   array(
+                      'type' => 'text',                              
+                      'label' => $this->l('Max Installments:'),         
+                      'desc' => $this->l('Maximum value of plots'),  
+                       'name' => 'PAGGI_MAX_INSTALLMENTS',  
+                     
+                    ),
+                   array(
+                      'type' => 'text',                              
+                      'label' => $this->l('Interest Rate:'),         
+                      'desc' => $this->l('Interest rate value'),
+                      'name' => 'PAGGI_INTEREST_RATE'
+                     
+                    )
+                   
                    ),
                 'submit' => array(
                     'title' => $this->l('Save'),
