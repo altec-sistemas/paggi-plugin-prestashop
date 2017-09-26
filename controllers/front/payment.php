@@ -67,10 +67,18 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
             Tools::redirect('index.php?controller=order&step=1');
         }
 
-        $this->paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
+        if(!empty($this->module->key)){
+            $this->paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
+
+           $this->displayChooseCard();     
+
+        }else{
+            $this->displayNotConfig();
+        }
+        
       
         
-        $this->displayChooseCard();
+        
     }
 
 
@@ -92,5 +100,11 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
         ));
 
         $this->setTemplate('choose_card.tpl');
+    }
+
+
+    protected function displayNotConfig()
+    {
+       $this->setTemplate('not_config.tpl');
     }
 }
