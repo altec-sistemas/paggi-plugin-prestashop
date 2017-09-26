@@ -83,7 +83,7 @@ class Paggi extends PaymentModule
         $config = Configuration::getMultiple(
             array(
                 'PAGGI_API_KEY_PRODUCTION',
-                'PAGGI_API_KEY_TEST',
+                'PAGGI_API_KEY_STAGING',
                 'PAGGI_ENVIRONMENT')
         );
         if (!empty($config['PAGGI_ENVIRONMENT'])) {
@@ -91,8 +91,8 @@ class Paggi extends PaymentModule
         }
 
         if (!$this->env) {
-            if (!empty($config['PAGGI_API_KEY_TEST'])) {
-                $this->key = $config['PAGGI_API_KEY_TEST'];
+            if (!empty($config['PAGGI_API_KEY_STAGING'])) {
+                $this->key = $config['PAGGI_API_KEY_STAGING'];
                 \Paggi\Paggi::setStaging(true);
             }
         } else {
@@ -112,9 +112,9 @@ class Paggi extends PaymentModule
 
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
-        //warning access envirement test
+        //warning access envirement staging
         if (!$this->env) {
-            $this->adminDisplayWarning($this->l('You are in a test environment this module.'));
+            $this->adminDisplayWarning($this->l('You are in a staging environment this module.'));
         }
 
         if (empty($this->key)) {
@@ -157,7 +157,7 @@ class Paggi extends PaymentModule
         if (!parent::uninstall()
             || !PaggiCustommer::dropTable()
             || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
-            || !Configuration::deleteByName('PAGGI_API_KEY_TEST')
+            || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
             || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
             || !Configuration::deleteByName('PAGGI_IMG')
         ) {
@@ -330,7 +330,7 @@ class Paggi extends PaymentModule
     {
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
-            Configuration::updateValue('PAGGI_API_KEY_TEST', Tools::getValue('PAGGI_API_KEY_TEST'));
+            Configuration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
             Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
             Configuration::updateValue('PAGGI_STATUS_APPROVED' , Tools::getValue('PAGGI_STATUS_APPROVED' ));
             Configuration::updateValue('PAGGI_STATUS_DECLINED' , Tools::getValue('PAGGI_STATUS_DECLINED' ));
@@ -429,8 +429,8 @@ class Paggi extends PaymentModule
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Api Key (Test)'),
-                        'name' => 'PAGGI_API_KEY_TEST',
+                        'label' => $this->l('Api Key (Staging)'),
+                        'name' => 'PAGGI_API_KEY_STAGING',
                         'desc' => $this->l('You can test out our API using this key: B31DCE74-E768-43ED-86DA-85501612548F, even before you create an account with us! All charges made with this key will be in demonstration mode an will not charge any card!'),
                         'size' => 36,
                         'required' => false,
@@ -452,7 +452,7 @@ class Paggi extends PaymentModule
                             array(
                               'id' => 'active_off',
                               'value' => 0,
-                              'label' => $this->l('Test'),
+                              'label' => $this->l('Staging'),
                             ),
                       ),
                     ),
@@ -506,7 +506,7 @@ class Paggi extends PaymentModule
           'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
           'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
           'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
-          'PAGGI_API_KEY_TEST' => Tools::getValue('PAGGI_API_KEY_TEST', Configuration::get('PAGGI_API_KEY_TEST')),
+          'PAGGI_API_KEY_STAGING' => Tools::getValue('PAGGI_API_KEY_STAGING', Configuration::get('PAGGI_API_KEY_STAGING')),
           'PAGGI_ENVIRONMENT' => Tools::getValue('PAGGI_ENVIRONMENT', Configuration::get('PAGGI_ENVIRONMENT')),
           'PAGGI_IMG' => Tools::getValue('PAGGI_IMG', Configuration::get('PAGGI_IMG')),
           'PAGGI_STATUS_APPROVED' => Tools::getValue('PAGGI_STATUS_APPROVED', Configuration::get('PAGGI_STATUS_APPROVED')),
