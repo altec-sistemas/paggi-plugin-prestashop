@@ -138,7 +138,7 @@ class Paggi extends PaymentModule
         if (!parent::install()
             || !$this->registerHook('payment')
             || !$this->registerHook('paymentReturn')
-            || !$this->registerHook('actionOrderStatusPostUpdate')
+            || !$this->registerHook('actionOrderHistoryAddAfter')
             || !PaggiCustomer::createTable()
         ) {
             return false;
@@ -228,48 +228,38 @@ class Paggi extends PaymentModule
      *
      * @return void
      */
-    public function hookActionOrderStatusPostUpdate($params){
+    public function hookActionOrderHistoryAddAfter($params){
 
-      $order = new Order($params["id_order"]);
+      $orderHistory = $params['order_history'];
+
+      $order = new Order($orderHistory->id_order);
 
       $orderPayment = $order->getOrderPayments();
 
       $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
 
+      $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));     
+    
+      if(Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status != 'captured'){      
 
-      $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));      
-     
-      // print_r($params["newOrderStatus"]);
-      // die();
-      if(Configuration::get('PAGGI_STATUS_WAIT') == $params["newOrderStatus"]->id){
-        $order->current_state = (int)$new_status;
-        $order->update();
-        $order->setCurrentState($new_status);
+        $charge_captured = \Paggi\Charge::capture($charge->id);
 
-      }else if(Configuration::get('PAGGI_STATUS_CAPTURED') == $params["newOrderStatus"]->id && $charge->status != 'captured'){      
+        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));    
 
-          $charge_captured = \Paggi\Charge::capture($charge->id);
-
-          $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
-
-          $order->current_state = (int)$new_status;
-        $order->update();
-          $order->setCurrentState($new_status);
-                    
-
-      
-
-      }else if(Configuration::get('PAGGI_STATUS_CANCELLED') == $params["newOrderStatus"]->id && $charge->status != 'cancelled'){           
+      }else if(Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && $charge->status != 'cancelled'){           
       
         $charge_cancel = \Paggi\Charge::cancel($charge->id);
-       
-
-        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
-        $order->current_state = (int)$new_status;
-        $order->update();
-        $order->setCurrentState($new_status);
+        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));        
 
       }
+
+      $orderHistory->id_order_state  = (int)$new_status; 
+    
+      if($orderHistory->update()){      
+        $order->current_state = $orderHistory->id_order_state;
+        $order->update();   
+        
+      }  
       
     
     }
