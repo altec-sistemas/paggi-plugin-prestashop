@@ -156,11 +156,11 @@ class Paggi extends PaymentModule
     public function uninstall()
     {
         if (!parent::uninstall()
-            // || !PaggiCustommer::dropTable()
-            // || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
-            // || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
-            // || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
-            // || !Configuration::deleteByName('PAGGI_IMG')
+            || !PaggiCustomer::dropTable()
+            || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
+            || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
+            || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
+            || !Configuration::deleteByName('PAGGI_IMG')
         ) {
             return false;
         }
