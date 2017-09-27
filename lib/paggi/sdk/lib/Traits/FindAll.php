@@ -2,19 +2,18 @@
 
 namespace Paggi\Traits;
 
-use Paggi\RestClient;
+use \Paggi\RestClient;
 
 /**
- * Trait FindAll - Find all resources.
+ * Trait FindAll - Find all resources
+ * @package Paggi\Traits
  */
 trait FindAll
 {
     /**
-     * GET METHOD.
-     *
+     * GET METHOD
      * @param $rest - The RestClient object
      * @param $query_params - QueryParams for filter and pagination
-     *
      * @return mixed - Exception or response
      */
     public static function findAll($query_params = [])

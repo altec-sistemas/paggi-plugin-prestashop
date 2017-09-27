@@ -59,16 +59,24 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
+
+       
         
 
         $card_id = Tools::getValue('PAGGI_CHOOSE_CARD_ID');
         $installments_number = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
 
+        if(empty($card_id) || empty($installments_number)){
+
+            Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+        }
+
 
         $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
 
-      
-        $price = $cart->getOrderTotal(true, Cart::BOTH) * 100;
+        $currency = $this->context->currency;
+        $total = $cart->getOrderTotal(true, Cart::BOTH);
+        $price = $total * 100;
 
         //params create card
         $params = array(
@@ -81,11 +89,21 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 
         $charge = \Paggi\Charge::create($params);
 
-        $status = Configuration::getGlobalValue('PAGGI_STATUS_'.strtoupper($charge->status));
+        $status_wait = Configuration::getGlobalValue('PAGGI_STATUS_WAIT');
+     
+
+		if($this->module->validateOrder((int)$cart->id, $status_wait, $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key))
+        {
 
 
-		$this->module->validateOrder((int)$cart->id, $status, $total, $this->module->displayName, NULL, array(), (int)$currency->id, false, $customer->secure_key);
+           Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
+        }else{
+
+
+        }
+
+       
 		
-		Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
+		
     }
 }

@@ -3,43 +3,43 @@
 namespace Paggi;
 
 /**
- * Class Paggi manage all resoucers and API values.
+ * Class Paggi manage all resoucers and API values
+ * @package Paggi
  */
 class Paggi
 {
-    private static $isStaging; //Enviroment staging
-    private static $token; //Token value
+    static private $isStaging; //Enviroment staging
+    static private $token; //Token value
 
-    public static function setApiKey($api_key = '')
-    {
-        if (is_null($api_key) || 0 == strcmp($api_key, '')) {
-            throw new PaggiException(array('type' => 'Unauthorized', 'message' => "The parameter 'token' cannot be a null or empty string"));
+    static public function setApiKey($api_key = ""){
+        if (is_null($api_key) || strcmp($api_key, "") == 0) {
+            throw new PaggiException(array("type" => "Unauthorized", "message" => "The parameter 'token' cannot be a null or empty string"));
         }
         self::$token = $api_key;
     }
 
-    public static function setStaging($staging = false)
-    {
+    static public function setStaging($staging = false){
         self::$isStaging = $staging;
     }
 
     /**
-     * Get a token value.
-     *
+     * Get a token value
      * @return Token value
      */
-    public static function getToken()
+    static public function getToken()
     {
         return self::$token;
     }
 
     /**
-     * Get if the environment is staging.
-     *
+     * Get if the environment is staging
      * @return bool
      */
-    public static function isStaging()
+    static public function isStaging()
     {
         return self::$isStaging;
     }
+
 }
+
+?>

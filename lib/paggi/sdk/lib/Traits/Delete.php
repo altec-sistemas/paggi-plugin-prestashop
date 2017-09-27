@@ -2,19 +2,18 @@
 
 namespace Paggi\Traits;
 
-use Paggi\RestClient;
+use \Paggi\RestClient;
 
 /**
- * Trait Delete - Delete a resource.
+ * Trait Delete - Delete a resource
+ * @package Paggi\Traits
  */
 trait Delete
 {
     /**
-     * DELETE METHOD.
-     *
+     * DELETE METHOD
      * @param $rest - The RestClient object
      * @param $id - ID resource
-     *
      * @return mixed - Exception or Response
      */
     public function delete()
@@ -25,7 +24,7 @@ trait Delete
 
         $idResource = get_object_vars($this)['id'];
 
-        $curl->delete($rest->getEndpoint($class->getShortName()).'/'.$idResource);
+        $curl->delete($rest->getEndpoint($class->getShortName()) . "/" . $idResource);
 
         return true;
     }

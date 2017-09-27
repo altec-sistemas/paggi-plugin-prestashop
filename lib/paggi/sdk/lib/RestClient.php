@@ -3,17 +3,19 @@
 namespace Paggi;
 
 //Curl for manager the HTTP requests
-use Curl\Curl;
+use \Curl\Curl;
+
 use Doctrine\Common\Inflector\Inflector;
 
 /**
- * Class RestClient - This class manager the requests.
+ * Class RestClient - This class manager the requests
+ * @package Paggi
  */
 class RestClient
 {
     private $curl;
-    const BASE_STAGING = 'https://staging-online.paggi.com/api/v4/'; //STAGING
-    const BASE_PRODUCTION = 'https://online.paggi.com/api/v4/'; //PRODUCTION
+    const BASE_STAGING = "https://staging-online.paggi.com/api/v4/"; //STAGING
+    const BASE_PRODUCTION = "https://online.paggi.com/api/v4/"; //PRODUCTION
     private $endPoint;
 
     /**
@@ -26,51 +28,50 @@ class RestClient
 
         //Instance the curl
         $this->curl = new Curl();
-        $this->curl->setBasicAuthentication(Paggi::getToken(), '');
+        $this->curl->setBasicAuthentication(Paggi::getToken(), "");
         $this->curl->setDefaultJsonDecoder($assoc = true);
         $this->curl->setHeader('Content-Type', 'application/json; charset=utf-8');
         $this->curl->setDefaultTimeout();
 
-        if (array_key_exists('X_FORWARDED_FOR', $_SERVER)) {
-            $this->curl->setHeader('X-Forwarded-For', $_SERVER['X_FORWARDED_FOR']);
-        } else {
-            $this->curl->setHeader('X-Forwarded-For', $_SERVER['REMOTE_ADDR']);
+        if(array_key_exists('X_FORWARDED_FOR', $_SERVER))
+        {
+          $this->curl->setHeader('X-Forwarded-For', $_SERVER['X_FORWARDED_FOR']);
+        }
+        else
+        {
+          $this->curl->setHeader('X-Forwarded-For', $_SERVER['REMOTE_ADDR']);
         }
     }
 
     /**
-     * Return the Environment.
-     *
+     * Return the Environment
      * @param $isStaging
-     *
      * @return string API Environment
      */
     private function getEnviroment($isStaging = false)
     {
-        if (true == $isStaging) {
-            return self::BASE_STAGING;
+        if ($isStaging == true) {
+            return (self::BASE_STAGING);
         } else {
-            return self::BASE_PRODUCTION;
+            return (self::BASE_PRODUCTION);
         }
     }
 
     /**
-     * Get the Endpoint [banks - bank-accounts - customer - cards - charges].
+     * Get the Endpoint [banks - bank-accounts - customer - cards - charges]
      *
      * @param $resource - The resource used [banks - bank-accounts - customer - cards - charges]
-     *
      * @return string [banks - bank-accounts - customer - cards - charges]
      */
     public function getEndpoint($resource)
     {
         $entity = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', Inflector::pluralize($resource)));
 
-        return strtolower($this->endPoint.$entity);
+        return strtolower($this->endPoint . $entity);
     }
 
     /**
-     * Return the curl for manage the HTTP Requests.
-     *
+     * Return the curl for manage the HTTP Requests
      * @return Curl
      */
     public function getCurl()
@@ -78,3 +79,5 @@ class RestClient
         return $this->curl;
     }
 }
+
+?>

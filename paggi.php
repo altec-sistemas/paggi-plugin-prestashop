@@ -138,7 +138,8 @@ class Paggi extends PaymentModule
         if (!parent::install()
             || !$this->registerHook('payment')
             || !$this->registerHook('paymentReturn')
-            || !PaggiCustommer::createTable()
+            || !$this->registerHook('actionOrderStatusPostUpdate')
+            || !PaggiCustomer::createTable()
         ) {
             return false;
         }
@@ -155,11 +156,11 @@ class Paggi extends PaymentModule
     public function uninstall()
     {
         if (!parent::uninstall()
-            || !PaggiCustommer::dropTable()
-            || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
-            || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
-            || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
-            || !Configuration::deleteByName('PAGGI_IMG')
+            // || !PaggiCustommer::dropTable()
+            // || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
+            // || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
+            // || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
+            // || !Configuration::deleteByName('PAGGI_IMG')
         ) {
             return false;
         }
@@ -217,6 +218,60 @@ class Paggi extends PaymentModule
         $this->smarty->assign('status', 'ok');
 
         return $this->display(__FILE__, 'payment_return.tpl');
+    }
+
+
+     /**
+     * hook executed after changing purchase status
+     *
+     * @param Object $params dataParams
+     *
+     * @return void
+     */
+    public function hookActionOrderStatusPostUpdate($params){
+
+      $order = new Order($params["id_order"]);
+
+      $orderPayment = $order->getOrderPayments();
+
+      $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
+
+
+      $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));      
+     
+      // print_r($params["newOrderStatus"]);
+      // die();
+      if(Configuration::get('PAGGI_STATUS_WAIT') == $params["newOrderStatus"]->id){
+        $order->current_state = (int)$new_status;
+        $order->update();
+        $order->setCurrentState($new_status);
+
+      }else if(Configuration::get('PAGGI_STATUS_CAPTURED') == $params["newOrderStatus"]->id && $charge->status != 'captured'){      
+
+          $charge_captured = \Paggi\Charge::capture($charge->id);
+
+          $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
+
+          $order->current_state = (int)$new_status;
+        $order->update();
+          $order->setCurrentState($new_status);
+                    
+
+      
+
+      }else if(Configuration::get('PAGGI_STATUS_CANCELLED') == $params["newOrderStatus"]->id && $charge->status != 'cancelled'){           
+      
+        $charge_cancel = \Paggi\Charge::cancel($charge->id);
+       
+
+        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
+        $order->current_state = (int)$new_status;
+        $order->update();
+        $order->setCurrentState($new_status);
+
+      }
+      
+    
     }
 
 
@@ -331,6 +386,7 @@ class Paggi extends PaymentModule
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
             Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
+            Configuration::updateValue('PAGGI_STATUS_WAIT', Tools::getValue('PAGGI_STATUS_WAIT'));
             Configuration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
             Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
             Configuration::updateValue('PAGGI_STATUS_APPROVED' , Tools::getValue('PAGGI_STATUS_APPROVED' ));
@@ -339,9 +395,9 @@ class Paggi extends PaymentModule
             Configuration::updateValue('PAGGI_STATUS_PRE_APPROVED', Tools::getValue('PAGGI_STATUS_PRE_APPROVED'));
             Configuration::updateValue('PAGGI_STATUS_CLEARED', Tools::getValue('PAGGI_STATUS_CLEARED'));
             Configuration::updateValue('PAGGI_STATUS_NOT_CLEARED' , Tools::getValue('PAGGI_STATUS_NOT_CLEARED' ));
-            Configuration::updateValue('PAGGI_STATUS_MANUAL_CLEARED', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARED'));
+            Configuration::updateValue('PAGGI_STATUS_MANUAL_CLEARING', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING'));
             Configuration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
-            Configuration::updateValue('PAGGI_STATUS_CAPTURED' , Tools::getValue('PAGGI_STATUS_CAPTURED' ));
+            Configuration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
             Configuration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
 
             $this->uploadImg();
@@ -504,6 +560,7 @@ class Paggi extends PaymentModule
         return array(
 
           'PAGGI_DOCUMENT_FIELD' => Tools::getValue('PAGGI_DOCUMENT_FIELD', Configuration::get('PAGGI_DOCUMENT_FIELD')),
+          'PAGGI_STATUS_WAIT' => Tools::getValue('PAGGI_STATUS_WAIT', Configuration::get('PAGGI_STATUS_WAIT')),
            'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
           'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
           'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
@@ -517,9 +574,9 @@ class Paggi extends PaymentModule
           'PAGGI_STATUS_PRE_APPROVED' => Tools::getValue('PAGGI_STATUS_PRE_APPROVED', Configuration::get('PAGGI_STATUS_PRE_APPROVED')),
           'PAGGI_STATUS_CLEARED' => Tools::getValue('PAGGI_STATUS_CLEARED', Configuration::get('PAGGI_STATUS_CLEARED')),
           'PAGGI_STATUS_NOT_CLEARED' => Tools::getValue('PAGGI_STATUS_NOT_CLEARED', Configuration::get('PAGGI_STATUS_NOT_CLEARED')),
-          'PAGGI_STATUS_MANUAL_CLEARED' => Tools::getValue('PAGGI_STATUS_MANUAL_CLEARED', Configuration::get('PAGGI_STATUS_MANUAL_CLEARED')),
+          'PAGGI_STATUS_MANUAL_CLEARING' => Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING', Configuration::get('PAGGI_STATUS_MANUAL_CLEARING')),
           'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
-          'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
+          'PAGGI_STATUS_CANCELLED' => Tools::getValue('PAGGI_STATUS_CANCELLED', Configuration::get('PAGGI_STATUS_CANCELLED')),
           'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK'))
         );
     }
@@ -527,6 +584,8 @@ class Paggi extends PaymentModule
 
 
     public function getFieldsFormStatus($options_status){
+
+   
        $fields_form_status = array(
            'form' => array(
                 'legend' => array(
@@ -534,7 +593,18 @@ class Paggi extends PaymentModule
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
-                   
+                     
+                   array(
+                      'type' => 'select',                              
+                      'label' => $this->l('Wait:'),         
+                      'desc' => $this->l('State responsible for registering pending Paggi system return'),  
+                      'name' => 'PAGGI_STATUS_WAIT',
+                      'options' => array(
+                        'query' => $options_status,                       
+                        'id' => 'id_order_state',                           
+                        'name' => 'name'                           
+                      )
+                    ),
                    array(
                       'type' => 'select',                              
                       'label' => $this->l('Approved:'),         
@@ -609,7 +679,7 @@ class Paggi extends PaymentModule
                       'type' => 'select',                              
                       'label' => $this->l('Manual Cleared:'),         
                       'desc' => $this->l('Charge should be manually reviewed'),
-                      'name' => 'PAGGI_STATUS_MANUAL_CLEARED',
+                      'name' => 'PAGGI_STATUS_MANUAL_CLEARING',
                       'options' => array(
                         'query' => $options_status,
                         'id' => 'id_order_state',
@@ -634,7 +704,7 @@ class Paggi extends PaymentModule
                       'type' => 'select',                              
                       'label' => $this->l('Cancelled:'),         
                       'desc' => $this->l('Charge cancelled'),
-                      'name' => 'PAGGI_STATUS_CAPTURED',
+                      'name' => 'PAGGI_STATUS_CANCELLED',
                       'options' => array(
                         'query' => $options_status,
                         'id' => 'id_order_state',

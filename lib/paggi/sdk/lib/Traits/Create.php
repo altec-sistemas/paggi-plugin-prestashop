@@ -2,23 +2,22 @@
 
 namespace Paggi\Traits;
 
-use Paggi\RestClient;
+use \Paggi\RestClient;
 
 /**
- * Trait Create - Create/Create a new resource.
+ * Trait Create - Create/Create a new resource
+ * @package Paggi\Traits
  * */
 trait Create
 {
     /**
-     * POST METHOD.
+     * POST METHOD
      *
      * @param $params Resource paramns
-     *
      * @throws PaggiException Representation of HTTP error code
-     *
      * @return mixed Object representing created entity
      */
-    public static function create($params)
+    static public function create($params)
     {
         $rest = new RestClient();
         $curl = $rest->getCurl();

@@ -9,7 +9,6 @@ trait ModelBuild
     /**
      * This method get the response values and set it in to the parameters class.
      * $this -> is a class that call it.
-     *
      * @param $properties values from Json response
      */
     protected function buildObject($properties)
@@ -21,3 +20,6 @@ trait ModelBuild
         }
     }
 }
+
+
+?>
