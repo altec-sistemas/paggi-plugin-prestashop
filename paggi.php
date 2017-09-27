@@ -375,8 +375,7 @@ class Paggi extends PaymentModule
     {
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
-            Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
-            Configuration::updateValue('PAGGI_STATUS_WAIT', Tools::getValue('PAGGI_STATUS_WAIT'));
+            Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));       
             Configuration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
             Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
             Configuration::updateValue('PAGGI_STATUS_APPROVED' , Tools::getValue('PAGGI_STATUS_APPROVED' ));
@@ -550,7 +549,6 @@ class Paggi extends PaymentModule
         return array(
 
           'PAGGI_DOCUMENT_FIELD' => Tools::getValue('PAGGI_DOCUMENT_FIELD', Configuration::get('PAGGI_DOCUMENT_FIELD')),
-          'PAGGI_STATUS_WAIT' => Tools::getValue('PAGGI_STATUS_WAIT', Configuration::get('PAGGI_STATUS_WAIT')),
            'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
           'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
           'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
@@ -582,19 +580,8 @@ class Paggi extends PaymentModule
                     'title' => $this->l('Transaction status'),
                     'icon' => 'icon-cog',
                 ),
-                'input' => array(
-                     
-                   array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Wait:'),         
-                      'desc' => $this->l('State responsible for registering pending Paggi system return'),  
-                      'name' => 'PAGGI_STATUS_WAIT',
-                      'options' => array(
-                        'query' => $options_status,                       
-                        'id' => 'id_order_state',                           
-                        'name' => 'name'                           
-                      )
-                    ),
+                'input' => array(                     
+                  
                    array(
                       'type' => 'select',                              
                       'label' => $this->l('Approved:'),         

@@ -33,7 +33,7 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
     {
         parent::postProcess();
 
-        if (! Tools::isSubmit('PAGGI_TASK') ){
+        if (!Tools::isSubmit('PAGGI_TASK') ){
             return false;
         }
 
@@ -87,12 +87,9 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 			'force' => true
         );
 
-        $charge = \Paggi\Charge::create($params);
+        $charge = \Paggi\Charge::create($params);   
 
-        $status_wait = Configuration::getGlobalValue('PAGGI_STATUS_WAIT');
-     
-
-		if($this->module->validateOrder((int)$cart->id, $status_wait, $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key))
+		if($this->module->validateOrder((int)$cart->id, null, $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key))
         {
 
 
