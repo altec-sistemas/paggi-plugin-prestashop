@@ -56,24 +56,7 @@
 							
 
 					</div>
-
-					<div class="row">
-						<div class="col-xs-12 col-sm-12">
-							<div class="form-group">
-								<label for="cardalias_name">{l s='Card Alias'}</label>
-								<div class="input-group">
-												<span class="input-group-addon">
-													<span class="icon icon-cog" aria-hidden="true"></span>
-												</span>
-								<input type="text" id="cardalias_name"
-								class="is_required validate form-control" name="PAGGI_CARD_ALIAS" />
-								</div>
-							</div>
-						</div>						
-
-					</div>
-
-
+				
 
 					<div class="row">
 						<div class="col-xs-12 col-sm-12">
@@ -105,15 +88,10 @@
 						<div class="col-xs-12 col-sm-4">
 							<div class="form-group">
 								<label for="cvc">{l s='CVC'}</label>
-								<div class="input-group">
-									<input type="text" 
+								<input type="text" 
 									placeholder="•••" 
 									id="cvc"
 									class="is_required validate form-control" name="PAGGI_CARD_CVC" />
-									<span class="input-group-addon">
-										<span class="icon icon-question-sign" aria-hidden="true"></span>
-									</span>
-								</div>
 								
 							</div>
 						</div>					

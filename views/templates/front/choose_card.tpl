@@ -91,8 +91,16 @@
 									  		<img  width="50" src="https://online.paggi.com/images/{$card['brand']|lower}.png" />
 									  		</label>
 									  		</td>
-									  		<td style="font-size: 18px; text-align: center">•••• •••• •••• {$card['last4']}</td>
-									  		<td style="font-size: 18px; text-align: center">{$card['month']|str_pad:2:'0':$smarty.const.STR_PAD_LEFT} / {$card['year']}</td>
+									  		<td style="font-size: 15px; text-align: center">•••• •••• •••• {$card['last4']}</td>
+									  		<td style="font-size: 15px; text-align: center">{$card['month']|str_pad:2:'0':$smarty.const.STR_PAD_LEFT} / {$card['year']}</td>
+
+									  		<td>
+									  			<a  href="#"
+									  			data-id="{$card['id']}"
+												class="btn btn-primary button button-small delete" >
+												<span class="icon icon-trash" aria-hidden="true"></span>
+												</a>
+									  		</td>
 									  		
 									  		
 									  	</tr>
@@ -187,14 +195,37 @@
 
 <script type="text/javascript">
    
+   var endpointDeleteCard = "{$link->getModuleLink('paggi', 'card')}";
+
     {literal}
+
+
+    	$("form").find(".delete").click(function(e){
+
+    		e.preventDefault();
+    		
+    		var tag = this;
+    		var id_card = $(tag).data("id");
+
+    		$.post(endpointDeleteCard, {PAGGI_TASK_CARD:"DELETE_CARD", PAGGI_CARD_ID: id_card},
+    			function(data){
+
+    				
+    				if(data.status){
+    					$(tag).parent().parent().remove();
+    				}
+
+    				$(".validation_msg").html(data.message).show();
+    			}
+    		)	
+
+    	});
 
     	$("form").submit(function(){
 
     			if($(this).find("input[name=PAGGI_CHOOSE_CARD_ID]:checked").length == 0){
 
     					$(".validation_msg").html("Selecione o cartão para pagamento!").show();
-
 
     				return false;
     			}

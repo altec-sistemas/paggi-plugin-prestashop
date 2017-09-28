@@ -75,6 +75,13 @@ class PaggiCardModuleFrontController extends ModuleFrontController
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
+
+        //if function delete card
+        if(Tools::getValue('PAGGI_TASK_CARD') == "DELETE_CARD"){
+
+            $this->ajaxDeleteCard();
+
+        }
         
 
         $card_number = Tools::getValue('PAGGI_CARD_NUMBER');
@@ -133,6 +140,26 @@ class PaggiCardModuleFrontController extends ModuleFrontController
       
         
         $this->displayAddCard();
+    }
+
+
+    public function ajaxDeleteCard(){
+
+        $id_card = Tools::getValue("PAGGI_CARD_ID");
+
+        $card = \Paggi\Card::findById($id_card);
+
+        $response = array("status"=>false, "message"=> "Não foi possível excluir o cartão");
+
+        if($card->delete()){
+            $response = array("status"=>true, "message"=> "Cartão Exxluído com sucesso");
+        }
+
+        $json = Tools::jsonEncode($response);
+
+        header('Content-Type: application/json');
+        $this->ajaxDie($json);
+
     }
 
 
