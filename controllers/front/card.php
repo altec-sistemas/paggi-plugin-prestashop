@@ -109,9 +109,26 @@ class PaggiCardModuleFrontController extends ModuleFrontController
           'validate' => true
          );
 
-        $card_paggi = \Paggi\Card::create($params);
+        try{
+
+            $card_paggi = \Paggi\Card::create($params);
+
+            Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+
+        }catch(\Paggi\PaggiException $ex){
+            $message = Tools::jsonDecode($ex->getMessage());
+
+            foreach ($message->errors as $error) {
+                $this->errors[] = $error->message;
+            }
+
+
+           
+            //die($ex);
+        }
+        
               
-        Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+      
     }
 
     /**
@@ -149,10 +166,16 @@ class PaggiCardModuleFrontController extends ModuleFrontController
 
         $card = \Paggi\Card::findById($id_card);
 
-        $response = array("status"=>false, "message"=> "Não foi possível excluir o cartão");
+        $response = array(
+            "status"=>false, 
+            "message"=> $this->module->l('Could not delete credit card.', 'paggi') 
+        );
 
         if($card->delete()){
-            $response = array("status"=>true, "message"=> "Cartão Exxluído com sucesso");
+            $response = array(
+                "status"=>true, 
+                "message"=> $this->module->l('Credit card successfully deleted', 'paggi') 
+            );
         }
 
         $json = Tools::jsonEncode($response);
@@ -168,10 +191,12 @@ class PaggiCardModuleFrontController extends ModuleFrontController
         $cart = $this->context->cart;
         //passed data as parameter to the template
         $this->context->smarty->assign(array(
+            'nbProducts' => $cart->nbProducts(),
             'this_path' => $this->module->getPathUri(),
             'this_path_bw' => $this->module->getPathUri(),
             'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->module->name.'/',
-            'this_img' => $this->module->getPaggiImage()
+            'this_img' => $this->module->getPaggiImage(),
+            'errors' => $this->errors
         ));
 
         $this->setTemplate('add_card.tpl');

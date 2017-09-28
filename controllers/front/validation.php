@@ -89,14 +89,11 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 
         $charge = \Paggi\Charge::create($params);   
 
-		if($this->module->validateOrder((int)$cart->id, null, $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key))
+		if($this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key))
         {
 
 
            Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
-        }else{
-
-
         }
 
        

@@ -253,14 +253,18 @@ class Paggi extends PaymentModule
 
       }
 
-      $orderHistory->id_order_state  = (int)$new_status; 
+      if(is_int($new_status)){
+        $orderHistory->id_order_state  = (int)$new_status; 
     
-      if($orderHistory->update()){      
-        $order->current_state = $orderHistory->id_order_state;
-        $order->update();   
-        
-      }  
+        if($orderHistory->update()){      
+          $order->current_state = $orderHistory->id_order_state;
+          $order->update();   
+          
+        }  
       
+      }
+
+    
     
     }
 
