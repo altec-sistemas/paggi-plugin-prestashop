@@ -166,7 +166,7 @@
 				<div class="submit">
 
 					<button 
-					class="btn btn-success button button-medium exclusive" 
+					class="btn btn-success button button-medium " 
 					type="submit" 
 					name="PAGGI_TASK_CARD" 
 					value="PAGGI_OK"
@@ -177,7 +177,7 @@
 					</button>
 
 
-					<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="btn btn-default button button-medium">
+					<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="btn btn-default button button-medium exclusive">
 						<span>
 							{l s='Other payment methods' mod='paggi'}
 						</span>

@@ -58,9 +58,7 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
-        }
-
-       
+        }      
         
 
         $card_id = Tools::getValue('PAGGI_CHOOSE_CARD_ID');

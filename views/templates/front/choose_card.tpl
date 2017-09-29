@@ -169,7 +169,7 @@
 				<div class="submit">
 
 					<button 
-					class="btn btn-success button button-medium exclusive" 
+					class="btn btn-success button button-medium " 
 					type="submit" 
 					name="PAGGI_TASK" 
 					value="PAGGI_CONFIRMED">
@@ -181,7 +181,7 @@
 					
 
 
-					<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="btn btn-default button button-medium">
+					<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="btn btn-default button button-medium exclusive">
 						<span>
 							{l s='Other payment methods' mod='paggi'}
 						</span>
@@ -196,6 +196,8 @@
 <script type="text/javascript">
    
    var endpointDeleteCard = "{$link->getModuleLink('paggi', 'card')}";
+
+   var methodPaymentMessage = "{l s='Select the card for payment!' mod='paggi'}"
 
     {literal}
 
@@ -225,7 +227,7 @@
 
     			if($(this).find("input[name=PAGGI_CHOOSE_CARD_ID]:checked").length == 0){
 
-    					$(".validation_msg").html("Selecione o cartão para pagamento!").show();
+    					$(".validation_msg").html( methodPaymentMessage ).show();
 
     				return false;
     			}
