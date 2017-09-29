@@ -29,5 +29,4 @@ trait Update
 
         return self::manageResponse($curl);
     }
-
 }

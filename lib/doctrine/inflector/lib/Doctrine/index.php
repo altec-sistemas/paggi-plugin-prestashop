@@ -23,7 +23,7 @@
  * @package   Module
  * @author    Paggi <contact@paggi.com>
  * @copyright 2003-2017 Paggi
- * @license   http://opensource.org/licenses/afl-3.0.php 
+ * @license   http://opensource.org/licenses/afl-3.0.php
  *            Academic Free License (AFL 3.0)
  * @link      https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA

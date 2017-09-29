@@ -13,5 +13,3 @@ class Customer extends Entity
 {
     use FindAll, Create, FindById, Update;
 }
-
-?>

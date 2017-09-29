@@ -111,8 +111,7 @@ class PaggiCustomer extends ObjectModel
      * @return Json
      */
     public static function getLoadByCustomerPS($customer)
-    {   
-
+    {
         $field_document = Configuration::get('PAGGI_DOCUMENT_FIELD');
 
         //select data paggiCustomer

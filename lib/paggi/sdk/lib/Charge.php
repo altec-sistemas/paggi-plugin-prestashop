@@ -14,5 +14,3 @@ class Charge extends Entity
 {
     use FindAll, Create, FindById, Cancel, Capture;
 }
-
-?>

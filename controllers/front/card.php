@@ -67,7 +67,7 @@ class PaggiCardModuleFrontController extends ModuleFrontController
             }
         }
         if (!$authorized) {
-            die($this->module->l('This payment method is not available.', 'validation'));
+            die($this->module->l('This payment method is not available.', 'paggi'));
         }
 
         $customer = new Customer($cart->id_customer);
@@ -77,10 +77,8 @@ class PaggiCardModuleFrontController extends ModuleFrontController
         }
 
         //if function delete card
-        if(Tools::getValue('PAGGI_TASK_CARD') == "DELETE_CARD"){
-
+        if (Tools::getValue('PAGGI_TASK_CARD') == "DELETE_CARD") {
             $this->ajaxDeleteCard();
-
         }
         
 
@@ -109,13 +107,11 @@ class PaggiCardModuleFrontController extends ModuleFrontController
           'validate' => true
          );
 
-        try{
-
+        try {
             $card_paggi = \Paggi\Card::create($params);
 
             Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
-
-        }catch(\Paggi\PaggiException $ex){
+        } catch (\Paggi\PaggiException $ex) {
             $message = Tools::jsonDecode($ex->getMessage());
 
             foreach ($message->errors as $error) {
@@ -126,9 +122,6 @@ class PaggiCardModuleFrontController extends ModuleFrontController
            
             //die($ex);
         }
-        
-              
-      
     }
 
     /**
@@ -160,21 +153,21 @@ class PaggiCardModuleFrontController extends ModuleFrontController
     }
 
 
-    public function ajaxDeleteCard(){
-
+    public function ajaxDeleteCard()
+    {
         $id_card = Tools::getValue("PAGGI_CARD_ID");
 
         $card = \Paggi\Card::findById($id_card);
 
         $response = array(
-            "status"=>false, 
-            "message"=> $this->module->l('Could not delete credit card.', 'paggi') 
+            "status"=>false,
+            "message"=> $this->module->l('Could not delete credit card.', 'paggi')
         );
 
-        if($card->delete()){
+        if ($card->delete()) {
             $response = array(
-                "status"=>true, 
-                "message"=> $this->module->l('Credit card successfully deleted', 'paggi') 
+                "status"=>true,
+                "message"=> $this->module->l('Credit card successfully deleted', 'paggi')
             );
         }
 
@@ -182,7 +175,6 @@ class PaggiCardModuleFrontController extends ModuleFrontController
 
         header('Content-Type: application/json');
         $this->ajaxDie($json);
-
     }
 
 

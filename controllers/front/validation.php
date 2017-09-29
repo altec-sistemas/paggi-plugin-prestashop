@@ -18,10 +18,29 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author     Paggi <contact@paggi.com>
- * @copyright  2003-2017 Paggi
- * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @category    PaymentModule
+ * @package     Module
+ * @author      Paggi <contact@paggi.com>
+ * @copyright   2003-2017 Paggi
+ * @license     http://opensource.org/licenses/afl-3.0.php
+ *              Academic Free License (AFL 3.0)
+ * @link        https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA
+ */
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+/**
+ * Class PaggiValidationModuleFrontController
+ *
+ * @category ModuleFrontController
+ * @package  Module
+ * @author   Paggi <contact@paggi.com>
+ * @license  http://opensource.org/licenses/afl-3.0.php
+ *           Academic Free License (AFL 3.0)
+ * @link     https://github.com/paggi-com/plugin-prestashop.git
  */
 
 class PaggiValidationModuleFrontController extends ModuleFrontController
@@ -33,7 +52,7 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
     {
         parent::postProcess();
 
-        if (!Tools::isSubmit('PAGGI_TASK') ){
+        if (!Tools::isSubmit('PAGGI_TASK')) {
             return false;
         }
 
@@ -58,14 +77,13 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
-        }      
+        }
         
 
         $card_id = Tools::getValue('PAGGI_CHOOSE_CARD_ID');
         $installments_number = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
 
-        if(empty($card_id) || empty($installments_number)){
-
+        if (empty($card_id) || empty($installments_number)) {
             Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
         }
 
@@ -78,36 +96,28 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 
         //params create card
         $params = array(
-			'card_id' => $card_id,
-			'amount' => $price,
-			'risk_analysis' => true,
-			'installments_number' =>  $installments_number,
-			'force' => true
+            'card_id' => $card_id,
+            'amount' => $price,
+            'risk_analysis' => true,
+            'installments_number' =>  $installments_number,
+            'force' => true
         );
 
-        try{
-
+        try {
             $charge = \Paggi\Charge::create($params);
 
 
-            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key);
-    
-
-        }catch(\Paggi\PaggiException $ex){
-
-
+            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, null, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key);
+        } catch (\Paggi\PaggiException $ex) {
             $message = Tools::jsonDecode($ex->getMessage());
 
             foreach ($message->errors as $error) {
                 $this->errors[] = $error->message;
             }
 
-            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_ERROR'), $total, $this->module->displayName, NULL, array(), (int)$currency->id, false, $customer->secure_key);           
-
-        }   
+            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_ERROR'), $total, $this->module->displayName, null, array(), (int)$currency->id, false, $customer->secure_key);
+        }
       
-       Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
-		
-		
+        Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
     }
 }

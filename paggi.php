@@ -65,10 +65,9 @@ class Paggi extends PaymentModule
         require_once __DIR__.'/classes/PaggiCustomer.php';
 
         $this->name = 'paggi';
-
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.2';
-        $this->author = 'PrestaShop';
+        $this->version = '1.0.0';
+        $this->author = 'Paggi';
 
         $this->controllers = array('payment', 'validation', 'card');
 
@@ -119,12 +118,10 @@ class Paggi extends PaymentModule
 
         if (empty($this->key)) {
             $this->warning = $this->l('Api Key must be configured to use this module.');
-        }else{
-           //set init Api Key
+        } else {
+            //set init Api Key
             \Paggi\Paggi::setApiKey($this->key);
         }
-
-       
     }
 
     /**
@@ -157,10 +154,25 @@ class Paggi extends PaymentModule
     {
         if (!parent::uninstall()
             || !PaggiCustomer::dropTable()
+            || !Configuration::deleteByName('PAGGI_DOCUMENT_FIELD')
+            || !Configuration::deleteByName('PAGGI_FREE_INSTALLMENTS')
+            || !Configuration::deleteByName('PAGGI_MAX_INSTALLMENTS')
+            || !Configuration::deleteByName('PAGGI_INTEREST_RATE')
             || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
             || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
             || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
             || !Configuration::deleteByName('PAGGI_IMG')
+            || !Configuration::deleteByName('PAGGI_STATUS_APPROVED')
+            || !Configuration::deleteByName('PAGGI_STATUS_DECLINED')
+            || !Configuration::deleteByName('PAGGI_STATUS_REGISTERED')
+            || !Configuration::deleteByName('PAGGI_STATUS_PRE_APPROVED')
+            || !Configuration::deleteByName('PAGGI_STATUS_CLEARED')
+            || !Configuration::deleteByName('PAGGI_STATUS_NOT_CLEARED')
+            || !Configuration::deleteByName('PAGGI_STATUS_MANUAL_CLEARING')
+            || !Configuration::deleteByName('PAGGI_STATUS_CAPTURED')
+            || !Configuration::deleteByName('PAGGI_STATUS_CANCELLED')
+            || !Configuration::deleteByName('PAGGI_STATUS_CHARGEBACK')
+       
         ) {
             return false;
         }
@@ -217,24 +229,21 @@ class Paggi extends PaymentModule
         
         $orderState = $params['objOrder']->getCurrentOrderState();
 
-        if($orderState->id != Configuration::get('PS_OS_ERROR')){
-
-          $this->smarty->assign(array(
+        if ($orderState->id != Configuration::get('PS_OS_ERROR')) {
+            $this->smarty->assign(array(
               'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
               'status' => 'ok',
               'id_order' => $params['objOrder']->id,
               'orderState' => $orderState
             ));
 
-            if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
-              $this->smarty->assign('reference', $params['objOrder']->reference);
-          
-
-        }else{
+            if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference)) {
+                $this->smarty->assign('reference', $params['objOrder']->reference);
+            }
+        } else {
 
           //condition for return message, where status 'ok' or 'failed'
-          $this->smarty->assign('status', 'failed');
-
+            $this->smarty->assign('status', 'failed');
         }
 
        
@@ -243,51 +252,42 @@ class Paggi extends PaymentModule
     }
 
 
-     /**
-     * hook executed after changing purchase status
-     *
-     * @param Object $params dataParams
-     *
-     * @return void
-     */
-    public function hookActionOrderHistoryAddAfter($params){
+    /**
+    * hook executed after changing purchase status
+    *
+    * @param Object $params dataParams
+    *
+    * @return void
+    */
+    public function hookActionOrderHistoryAddAfter($params)
+    {
+        $orderHistory = $params['order_history'];
 
-      $orderHistory = $params['order_history'];
+        $order = new Order($orderHistory->id_order);
 
-      $order = new Order($orderHistory->id_order);
+        $orderPayment = $order->getOrderPayments();
 
-      $orderPayment = $order->getOrderPayments();
+        $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
 
-      $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
-
-      $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));     
+        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));
     
-      if(Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status != 'captured'){      
+        if (Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status != 'captured') {
+            $charge_captured = \Paggi\Charge::capture($charge->id);
 
-        $charge_captured = \Paggi\Charge::capture($charge->id);
+            $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
+        } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && $charge->status != 'cancelled') {
+            $charge_cancel = \Paggi\Charge::cancel($charge->id);
+            $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
+        }
 
-        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));    
-
-      }else if(Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && $charge->status != 'cancelled'){           
-      
-        $charge_cancel = \Paggi\Charge::cancel($charge->id);
-        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));        
-
-      }
-
-      if(is_int($new_status)){
-        $orderHistory->id_order_state  = (int)$new_status; 
+        if (is_int($new_status)) {
+            $orderHistory->id_order_state  = (int)$new_status;
     
-        if($orderHistory->update()){      
-          $order->current_state = $orderHistory->id_order_state;
-          $order->update();   
-          
-        }  
-      
-      }
-
-    
-    
+            if ($orderHistory->update()) {
+                $order->current_state = $orderHistory->id_order_state;
+                $order->update();
+            }
+        }
     }
 
 
@@ -400,21 +400,26 @@ class Paggi extends PaymentModule
     protected function postProcess()
     {
         if (Tools::isSubmit('btnSubmit')) {
-            Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
-            Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));       
-            Configuration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
-            Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
-            Configuration::updateValue('PAGGI_STATUS_APPROVED' , Tools::getValue('PAGGI_STATUS_APPROVED' ));
-            Configuration::updateValue('PAGGI_STATUS_DECLINED' , Tools::getValue('PAGGI_STATUS_DECLINED' ));
-            Configuration::updateValue('PAGGI_STATUS_REGISTERED', Tools::getValue('PAGGI_STATUS_REGISTERED'));
-            Configuration::updateValue('PAGGI_STATUS_PRE_APPROVED', Tools::getValue('PAGGI_STATUS_PRE_APPROVED'));
-            Configuration::updateValue('PAGGI_STATUS_CLEARED', Tools::getValue('PAGGI_STATUS_CLEARED'));
-            Configuration::updateValue('PAGGI_STATUS_NOT_CLEARED' , Tools::getValue('PAGGI_STATUS_NOT_CLEARED' ));
-            Configuration::updateValue('PAGGI_STATUS_MANUAL_CLEARING', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING'));
-            Configuration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
-            Configuration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
-            Configuration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
+            Confirguration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
+            Confirguration::updateValue('PAGGI_FREE_INSTALLMENTS', Tools::getValue('PAGGI_FREE_INSTALLMENTS'));
+            Confirguration::updateValue('PAGGI_MAX_INSTALLMENTS', Tools::getValue('PAGGI_MAX_INSTALLMENTS'));
+            Confirguration::updateValue('PAGGI_INTEREST_RATE', Tools::getValue('PAGGI_INTEREST_RATE'));
+            Confirguration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
+            Confirguration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
+            Confirguration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
+            Confirguration::updateValue('PAGGI_STATUS_APPROVED', Tools::getValue('PAGGI_STATUS_APPROVED'));
+            Confirguration::updateValue('PAGGI_STATUS_DECLINED', Tools::getValue('PAGGI_STATUS_DECLINED'));
+            Confirguration::updateValue('PAGGI_STATUS_REGISTERED', Tools::getValue('PAGGI_STATUS_REGISTERED'));
+            Confirguration::updateValue('PAGGI_STATUS_PRE_APPROVED', Tools::getValue('PAGGI_STATUS_PRE_APPROVED'));
+            Confirguration::updateValue('PAGGI_STATUS_CLEARED', Tools::getValue('PAGGI_STATUS_CLEARED'));
+            Confirguration::updateValue('PAGGI_STATUS_NOT_CLEARED', Tools::getValue('PAGGI_STATUS_NOT_CLEARED'));
+            Confirguration::updateValue('PAGGI_STATUS_MANUAL_CLEARING', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING'));
+            Confirguration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
+            Confirguration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
+            Confirguration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
 
+
+    
             $this->uploadImg();
         }
         $this->html .= $this->displayConfirmation($this->l('Settings updated'));
@@ -460,7 +465,6 @@ class Paggi extends PaymentModule
      */
     public function renderForm()
     {
-
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
 
         //prepare view paggi image temp
@@ -566,7 +570,7 @@ class Paggi extends PaymentModule
     }
 
     /**
-     * Load Configuration Variables
+     * Load Configuration General Variables
      *
      * @return Array
      */
@@ -574,66 +578,70 @@ class Paggi extends PaymentModule
     {
         return array(
 
-          'PAGGI_DOCUMENT_FIELD' => Tools::getValue('PAGGI_DOCUMENT_FIELD', Configuration::get('PAGGI_DOCUMENT_FIELD')),
-           'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
-          'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
-          'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
-          'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
-          'PAGGI_API_KEY_STAGING' => Tools::getValue('PAGGI_API_KEY_STAGING', Configuration::get('PAGGI_API_KEY_STAGING')),
-          'PAGGI_ENVIRONMENT' => Tools::getValue('PAGGI_ENVIRONMENT', Configuration::get('PAGGI_ENVIRONMENT')),
-          'PAGGI_IMG' => Tools::getValue('PAGGI_IMG', Configuration::get('PAGGI_IMG')),
-          'PAGGI_STATUS_APPROVED' => Tools::getValue('PAGGI_STATUS_APPROVED', Configuration::get('PAGGI_STATUS_APPROVED')),
-          'PAGGI_STATUS_DECLINED' => Tools::getValue('PAGGI_STATUS_DECLINED', Configuration::get('PAGGI_STATUS_DECLINED')),
-          'PAGGI_STATUS_REGISTERED' => Tools::getValue('PAGGI_STATUS_REGISTERED', Configuration::get('PAGGI_STATUS_REGISTERED')),
-          'PAGGI_STATUS_PRE_APPROVED' => Tools::getValue('PAGGI_STATUS_PRE_APPROVED', Configuration::get('PAGGI_STATUS_PRE_APPROVED')),
-          'PAGGI_STATUS_CLEARED' => Tools::getValue('PAGGI_STATUS_CLEARED', Configuration::get('PAGGI_STATUS_CLEARED')),
-          'PAGGI_STATUS_NOT_CLEARED' => Tools::getValue('PAGGI_STATUS_NOT_CLEARED', Configuration::get('PAGGI_STATUS_NOT_CLEARED')),
-          'PAGGI_STATUS_MANUAL_CLEARING' => Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING', Configuration::get('PAGGI_STATUS_MANUAL_CLEARING')),
-          'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
-          'PAGGI_STATUS_CANCELLED' => Tools::getValue('PAGGI_STATUS_CANCELLED', Configuration::get('PAGGI_STATUS_CANCELLED')),
-          'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK'))
+            'PAGGI_DOCUMENT_FIELD' => Tools::getValue('PAGGI_DOCUMENT_FIELD', Configuration::get('PAGGI_DOCUMENT_FIELD')),
+            'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
+            'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
+            'PAGGI_INTEREST_RATE' => Tools::getValue('PAGGI_INTEREST_RATE', Configuration::get('PAGGI_INTEREST_RATE')),
+            'PAGGI_API_KEY_PRODUCTION' => Tools::getValue('PAGGI_API_KEY_PRODUCTION', Configuration::get('PAGGI_API_KEY_PRODUCTION')),
+            'PAGGI_API_KEY_STAGING' => Tools::getValue('PAGGI_API_KEY_STAGING', Configuration::get('PAGGI_API_KEY_STAGING')),
+            'PAGGI_ENVIRONMENT' => Tools::getValue('PAGGI_ENVIRONMENT', Configuration::get('PAGGI_ENVIRONMENT')),
+            'PAGGI_IMG' => Tools::getValue('PAGGI_IMG', Configuration::get('PAGGI_IMG')),
+            'PAGGI_STATUS_APPROVED' => Tools::getValue('PAGGI_STATUS_APPROVED', Configuration::get('PAGGI_STATUS_APPROVED')),
+            'PAGGI_STATUS_DECLINED' => Tools::getValue('PAGGI_STATUS_DECLINED', Configuration::get('PAGGI_STATUS_DECLINED')),
+            'PAGGI_STATUS_REGISTERED' => Tools::getValue('PAGGI_STATUS_REGISTERED', Configuration::get('PAGGI_STATUS_REGISTERED')),
+            'PAGGI_STATUS_PRE_APPROVED' => Tools::getValue('PAGGI_STATUS_PRE_APPROVED', Configuration::get('PAGGI_STATUS_PRE_APPROVED')),
+            'PAGGI_STATUS_CLEARED' => Tools::getValue('PAGGI_STATUS_CLEARED', Configuration::get('PAGGI_STATUS_CLEARED')),
+            'PAGGI_STATUS_NOT_CLEARED' => Tools::getValue('PAGGI_STATUS_NOT_CLEARED', Configuration::get('PAGGI_STATUS_NOT_CLEARED')),
+            'PAGGI_STATUS_MANUAL_CLEARING' => Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING', Configuration::get('PAGGI_STATUS_MANUAL_CLEARING')),
+            'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
+            'PAGGI_STATUS_CANCELLED' => Tools::getValue('PAGGI_STATUS_CANCELLED', Configuration::get('PAGGI_STATUS_CANCELLED')),
+            'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK'))
         );
     }
 
 
 
-    public function getFieldsFormStatus($options_status){
-
-   
-       $fields_form_status = array(
+    /**
+     * Load Configuration Status Variables
+     *
+     * @return Array
+     */
+    public function getFieldsFormStatus($options_status)
+    {
+        $fields_form_status = array(
            'form' => array(
                 'legend' => array(
                     'title' => $this->l('Transaction status'),
                     'icon' => 'icon-cog',
                 ),
-                'input' => array(                     
+                'input' => array(
                   
                    array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Approved:'),         
-                      'desc' => $this->l('Charge captured for acquirer'),  
+                      'type' => 'select',
+                      'label' => $this->l('Approved:'),
+                      'desc' => $this->l('Charge captured for acquirer'),
                       'name' => 'PAGGI_STATUS_APPROVED',
                       'options' => array(
-                        'query' => $options_status,                       
-                        'id' => 'id_order_state',                           
-                        'name' => 'name'                           
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
                       )
                     ),
 
                    array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Declined:'),         
-                      'desc' => $this->l('Charge declined for acquirer'),  
-                       'name' => 'PAGGI_STATUS_DECLINED',  
-                       'options' => array(         
-                        'query' => $options_status,                         
-                        'id' => 'id_order_state',                           
-                        'name' => 'name'                              
+                      'type' => 'select',
+                      'label' => $this->l('Declined:'),
+                      'desc' => $this->l('Charge declined for acquirer'),
+                       'name' => 'PAGGI_STATUS_DECLINED',
+                       'options' => array(
+                        'query' => $options_status,
+                        'id' => 'id_order_state',
+                        'name' => 'name'
                       )
                     ),
                    array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Registered:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Registered:'),
                       'desc' => $this->l('Charge registered but not captured'),
                       'name' => 'PAGGI_STATUS_REGISTERED',
                       'options' => array(
@@ -643,8 +651,8 @@ class Paggi extends PaymentModule
                       )
                     ),
                     array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Pre Approved:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Pre Approved:'),
                       'desc' => $this->l('Pre-authorization created in acquirer'),
                       'name' => 'PAGGI_STATUS_PRE_APPROVED',
                       'options' => array(
@@ -655,8 +663,8 @@ class Paggi extends PaymentModule
                     ),
 
                     array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Cleared:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Cleared:'),
                       'desc' => $this->l('Charge passing from the risk analysis'),
                       'name' => 'PAGGI_STATUS_CLEARED',
                       'options' => array(
@@ -667,8 +675,8 @@ class Paggi extends PaymentModule
                     ),
 
                     array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Not Cleared:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Not Cleared:'),
                       'desc' => $this->l('Charge declined from risk analysis'),
                       'name' => 'PAGGI_STATUS_NOT_CLEARED',
                       'options' => array(
@@ -679,8 +687,8 @@ class Paggi extends PaymentModule
                     ),
 
                      array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Manual Cleared:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Manual Cleared:'),
                       'desc' => $this->l('Charge should be manually reviewed'),
                       'name' => 'PAGGI_STATUS_MANUAL_CLEARING',
                       'options' => array(
@@ -692,8 +700,8 @@ class Paggi extends PaymentModule
 
 
                      array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Captured:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Captured:'),
                       'desc' => $this->l('Pre-authorization captured in acquirer'),
                       'name' => 'PAGGI_STATUS_CAPTURED',
                       'options' => array(
@@ -704,8 +712,8 @@ class Paggi extends PaymentModule
                     ),
 
                     array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Cancelled:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Cancelled:'),
                       'desc' => $this->l('Charge cancelled'),
                       'name' => 'PAGGI_STATUS_CANCELLED',
                       'options' => array(
@@ -716,8 +724,8 @@ class Paggi extends PaymentModule
                     ),
 
                     array(
-                      'type' => 'select',                              
-                      'label' => $this->l('Chargeback:'),         
+                      'type' => 'select',
+                      'label' => $this->l('Chargeback:'),
                       'desc' => $this->l('Chargeback from customer or bank'),
                       'name' => 'PAGGI_STATUS_CHARGEBACK',
                       'options' => array(
@@ -737,10 +745,14 @@ class Paggi extends PaymentModule
     }
 
 
-    public function getFieldsFormInstallments(){
-    
-
-       $fields_form_status = array(
+    /**
+    * Load Configuration Installments
+    *
+    * @return Array
+    */
+    public function getFieldsFormInstallments()
+    {
+        $fields_form_status = array(
            'form' => array(
                 'legend' => array(
                     'title' => $this->l('Installment Settings'),
@@ -749,22 +761,22 @@ class Paggi extends PaymentModule
                 'input' => array(
                    
                    array(
-                      'type' => 'text',                              
-                      'label' => $this->l('Free Installment:'),         
-                      'desc' => $this->l('Number of interest-free installments'),  
-                      'name' => 'PAGGI_FREE_INSTALLMENTS'                     
+                      'type' => 'text',
+                      'label' => $this->l('Free Installment:'),
+                      'desc' => $this->l('Number of interest-free installments'),
+                      'name' => 'PAGGI_FREE_INSTALLMENTS'
                     ),
 
                    array(
-                      'type' => 'text',                              
-                      'label' => $this->l('Max Installments:'),         
-                      'desc' => $this->l('Maximum value of plots'),  
-                       'name' => 'PAGGI_MAX_INSTALLMENTS',  
+                      'type' => 'text',
+                      'label' => $this->l('Max Installments:'),
+                      'desc' => $this->l('Maximum value of plots'),
+                       'name' => 'PAGGI_MAX_INSTALLMENTS',
                      
                     ),
                    array(
-                      'type' => 'text',                              
-                      'label' => $this->l('Interest Rate:'),         
+                      'type' => 'text',
+                      'label' => $this->l('Interest Rate:'),
                       'desc' => $this->l('Interest rate value'),
                       'name' => 'PAGGI_INTEREST_RATE'
                      
@@ -781,10 +793,14 @@ class Paggi extends PaymentModule
     }
 
 
-    public function getFieldsFormFieldMapping(){
-    
-
-       $fields_form_status = array(
+    /**
+    * Load Configuration Field Mapping
+    *
+    * @return Array
+    */
+    public function getFieldsFormFieldMapping()
+    {
+        $fields_form_status = array(
            'form' => array(
                 'legend' => array(
                     'title' => $this->l('Field Mapping'),
@@ -793,10 +809,10 @@ class Paggi extends PaymentModule
                 'input' => array(
                    
                    array(
-                      'type' => 'text',                              
+                      'type' => 'text',
                       'label' => $this->l('Document Field:'),
-                      'name' => 'PAGGI_DOCUMENT_FIELD'                     
-                    ),                
+                      'name' => 'PAGGI_DOCUMENT_FIELD'
+                    ),
                    
                    ),
                 'submit' => array(

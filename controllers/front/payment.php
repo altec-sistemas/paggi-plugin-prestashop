@@ -67,18 +67,13 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
             Tools::redirect('index.php?controller=order&step=1');
         }
 
-        if(!empty($this->module->key)){
+        if (!empty($this->module->key)) {
             $this->paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
 
-           $this->displayChooseCard();     
-
-        }else{
+            $this->displayChooseCard();
+        } else {
             $this->displayNotConfig();
         }
-        
-      
-        
-        
     }
 
 
@@ -105,6 +100,6 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
 
     protected function displayNotConfig()
     {
-       $this->setTemplate('not_config.tpl');
+        $this->setTemplate('not_config.tpl');
     }
 }

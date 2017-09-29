@@ -18,7 +18,7 @@ trait Util
      *
      * @throws PaggiException Exception
      */
-    static protected function manageResponse($responseCurl)
+    protected static function manageResponse($responseCurl)
     {
         $reflectedClass = get_called_class();
         $responseBody = $responseCurl->response;

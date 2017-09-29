@@ -12,21 +12,19 @@ use \Paggi\RestClient;
  */
 trait Cancel
 {
-  /**
-   * @param $rest - The RestClient object
-   * @param $id - Resouce ID
-   * @return mixed - Exception or a Response
-   */
-  static function cancel($id)
-  {
-    $rest = new RestClient();
-    $curl = $rest->getCurl();
-    $class = new \ReflectionClass(self::class);
+    /**
+     * @param $rest - The RestClient object
+     * @param $id - Resouce ID
+     * @return mixed - Exception or a Response
+     */
+    public static function cancel($id)
+    {
+        $rest = new RestClient();
+        $curl = $rest->getCurl();
+        $class = new \ReflectionClass(self::class);
 
-    $curl->put($rest->getEndpoint($class->getShortName()). '/'. $id .'/cancel');
+        $curl->put($rest->getEndpoint($class->getShortName()). '/'. $id .'/cancel');
 
-    return self::manageResponse($curl);
-  }
+        return self::manageResponse($curl);
+    }
 }
-
-?>
