@@ -85,16 +85,28 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
 			'force' => true
         );
 
-        $charge = \Paggi\Charge::create($params);   
+        try{
 
-		if($this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key))
-        {
+            $charge = \Paggi\Charge::create($params);
 
 
-           Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
-        }
+            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, NULL, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key);
+    
 
-       
+        }catch(\Paggi\PaggiException $ex){
+
+
+            $message = Tools::jsonDecode($ex->getMessage());
+
+            foreach ($message->errors as $error) {
+                $this->errors[] = $error->message;
+            }
+
+            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_ERROR'), $total, $this->module->displayName, NULL, array(), (int)$currency->id, false, $customer->secure_key);           
+
+        }   
+      
+       Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
 		
 		
     }

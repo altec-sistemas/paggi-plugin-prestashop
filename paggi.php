@@ -214,8 +214,30 @@ class Paggi extends PaymentModule
             return;
         }
 
-        //condition for return message, where status 'ok' or 'failed'
-        $this->smarty->assign('status', 'ok');
+        
+        $orderState = $params['objOrder']->getCurrentOrderState();
+
+        if($orderState->id != Configuration::get('PS_OS_ERROR')){
+
+          $this->smarty->assign(array(
+              'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
+              'status' => 'ok',
+              'id_order' => $params['objOrder']->id,
+              'orderState' => $orderState
+            ));
+
+            if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference))
+              $this->smarty->assign('reference', $params['objOrder']->reference);
+          
+
+        }else{
+
+          //condition for return message, where status 'ok' or 'failed'
+          $this->smarty->assign('status', 'failed');
+
+        }
+
+       
 
         return $this->display(__FILE__, 'payment_return.tpl');
     }
