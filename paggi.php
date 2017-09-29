@@ -400,23 +400,23 @@ class Paggi extends PaymentModule
     protected function postProcess()
     {
         if (Tools::isSubmit('btnSubmit')) {
-            Confirguration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
-            Confirguration::updateValue('PAGGI_FREE_INSTALLMENTS', Tools::getValue('PAGGI_FREE_INSTALLMENTS'));
-            Confirguration::updateValue('PAGGI_MAX_INSTALLMENTS', Tools::getValue('PAGGI_MAX_INSTALLMENTS'));
-            Confirguration::updateValue('PAGGI_INTEREST_RATE', Tools::getValue('PAGGI_INTEREST_RATE'));
-            Confirguration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
-            Confirguration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
-            Confirguration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
-            Confirguration::updateValue('PAGGI_STATUS_APPROVED', Tools::getValue('PAGGI_STATUS_APPROVED'));
-            Confirguration::updateValue('PAGGI_STATUS_DECLINED', Tools::getValue('PAGGI_STATUS_DECLINED'));
-            Confirguration::updateValue('PAGGI_STATUS_REGISTERED', Tools::getValue('PAGGI_STATUS_REGISTERED'));
-            Confirguration::updateValue('PAGGI_STATUS_PRE_APPROVED', Tools::getValue('PAGGI_STATUS_PRE_APPROVED'));
-            Confirguration::updateValue('PAGGI_STATUS_CLEARED', Tools::getValue('PAGGI_STATUS_CLEARED'));
-            Confirguration::updateValue('PAGGI_STATUS_NOT_CLEARED', Tools::getValue('PAGGI_STATUS_NOT_CLEARED'));
-            Confirguration::updateValue('PAGGI_STATUS_MANUAL_CLEARING', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING'));
-            Confirguration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
-            Confirguration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
-            Confirguration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
+            Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
+            Configuration::updateValue('PAGGI_FREE_INSTALLMENTS', Tools::getValue('PAGGI_FREE_INSTALLMENTS'));
+            Configuration::updateValue('PAGGI_MAX_INSTALLMENTS', Tools::getValue('PAGGI_MAX_INSTALLMENTS'));
+            Configuration::updateValue('PAGGI_INTEREST_RATE', Tools::getValue('PAGGI_INTEREST_RATE'));
+            Configuration::updateValue('PAGGI_API_KEY_PRODUCTION', Tools::getValue('PAGGI_API_KEY_PRODUCTION'));
+            Configuration::updateValue('PAGGI_API_KEY_STAGING', Tools::getValue('PAGGI_API_KEY_STAGING'));
+            Configuration::updateValue('PAGGI_ENVIRONMENT', Tools::getValue('PAGGI_ENVIRONMENT'));
+            Configuration::updateValue('PAGGI_STATUS_APPROVED', Tools::getValue('PAGGI_STATUS_APPROVED'));
+            Configuration::updateValue('PAGGI_STATUS_DECLINED', Tools::getValue('PAGGI_STATUS_DECLINED'));
+            Configuration::updateValue('PAGGI_STATUS_REGISTERED', Tools::getValue('PAGGI_STATUS_REGISTERED'));
+            Configuration::updateValue('PAGGI_STATUS_PRE_APPROVED', Tools::getValue('PAGGI_STATUS_PRE_APPROVED'));
+            Configuration::updateValue('PAGGI_STATUS_CLEARED', Tools::getValue('PAGGI_STATUS_CLEARED'));
+            Configuration::updateValue('PAGGI_STATUS_NOT_CLEARED', Tools::getValue('PAGGI_STATUS_NOT_CLEARED'));
+            Configuration::updateValue('PAGGI_STATUS_MANUAL_CLEARING', Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING'));
+            Configuration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
+            Configuration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
+            Configuration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
 
 
     
