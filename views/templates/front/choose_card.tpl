@@ -34,6 +34,7 @@
 
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
+{include file="$tpl_dir./errors.tpl"}
 
 {if $nbProducts <= 0}
 	<p class="warning">{l s='Your shopping cart is empty.' mod='paggi'}</p>

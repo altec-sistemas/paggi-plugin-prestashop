@@ -30,6 +30,7 @@
 
 {assign var='current_step' value='payment'}
 {include file="$tpl_dir./order-steps.tpl"}
+{include file="$tpl_dir./errors.tpl"}
 
 <p class="warning">{l s='Method of payment not configured.' mod='paggi'}</p>
 

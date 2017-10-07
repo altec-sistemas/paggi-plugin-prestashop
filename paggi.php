@@ -284,7 +284,7 @@ class Paggi extends PaymentModule
 
         }catch(\Paggi\PaggiException $ex){
 
-            $this->displayError($this->l('Paggi server error.'));
+            $this->adminDisplayWarning($this->l('Paggi server error.'));
 
             PrestaShopLogger::addLog($ex->getMessage());
 
@@ -429,6 +429,10 @@ class Paggi extends PaymentModule
             Configuration::updateValue('PAGGI_STATUS_CAPTURED', Tools::getValue('PAGGI_STATUS_CAPTURED'));
             Configuration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
             Configuration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
+            Configuration::updateValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED'));
+            Configuration::updateValue('PAGGI_CPF_FIELD_TABLE_MAPPED' , Tools::getValue('PAGGI_CPF_FIELD_TABLE_MAPPED' ));
+            Configuration::updateValue('PAGGI_CPF_FIELD_COLUMN_MAPPED' , Tools::getValue('PAGGI_CPF_FIELD_COLUMN_MAPPED' ));
+            Configuration::updateValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'));
 
 
     
@@ -581,6 +585,59 @@ class Paggi extends PaymentModule
         return $helper->generateForm(array($fields_form_configuration,$fields_form_installments, $fields_form_status, $fields_form_field_mapping));
     }
 
+
+
+    public function getCPF($id_customer){
+
+        $cpf = '';
+
+        if(Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1){
+
+
+
+        }else{
+
+             if(!empty(Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED')) 
+                && !empty(Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED')) 
+                && !empty(Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'))
+                )
+             {
+                $table_mapped = Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED');
+                $foreingkey_mapped = Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED');
+                $column_mapped = Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED');
+
+                try{
+                    
+                    $db_prefix = _DB_PREFIX_;
+                    $sql = "SELECT * FROM `{$db_prefix}{$table_mapped}` WHERE `{$foreingkey_mapped }` = {$id_customer}";
+
+
+
+                    $row = Db::getInstance()->getRow($sql);
+
+                    $cpf = $row[ $column_mapped];
+
+                
+
+                }catch(Exception $ex){
+                   PrestaShopLogger::addLog($ex->getMessage());
+
+                   $this->adminDisplayWarning($this->l('There was an error fetching data in the mapeamenti configuration.'));
+                }           
+
+               
+
+             }
+           
+
+
+
+
+        }
+
+        return $cpf;
+    }
+
     /**
      * Load Configuration General Variables
      *
@@ -607,7 +664,11 @@ class Paggi extends PaymentModule
             'PAGGI_STATUS_MANUAL_CLEARING' => Tools::getValue('PAGGI_STATUS_MANUAL_CLEARING', Configuration::get('PAGGI_STATUS_MANUAL_CLEARING')),
             'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
             'PAGGI_STATUS_CANCELLED' => Tools::getValue('PAGGI_STATUS_CANCELLED', Configuration::get('PAGGI_STATUS_CANCELLED')),
-            'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK'))
+            'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK')),
+            'PAGGI_CPF_FIELD_ACTIVED_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED', Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED')) ,
+            'PAGGI_CPF_FIELD_TABLE_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_TABLE_MAPPED', Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED')) ,
+            'PAGGI_CPF_FIELD_COLUMN_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_COLUMN_MAPPED', Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED')) ,
+            'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED', Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED')) 
         );
     }
 
@@ -815,15 +876,48 @@ class Paggi extends PaymentModule
         $fields_form_status = array(
            'form' => array(
                 'legend' => array(
-                    'title' => $this->l('Field Mapping'),
+                    'title' => $this->l('CPF Field Mapping'),
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
                    
+
+                    array(
+                      'type' => 'switch',
+                      'label' => $this->l('Paggi module native CPF customization:'),
+                      'name' => 'PAGGI_CPF_FIELD_ACTIVED_MAPPED',
+                      'is_bool' => true,
+                      'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    ),
+
                    array(
                       'type' => 'text',
-                      'label' => $this->l('Document Field:'),
-                      'name' => 'PAGGI_DOCUMENT_FIELD'
+                      'label' => $this->l('Table to be mapped:'),
+                      'name' => 'PAGGI_CPF_FIELD_TABLE_MAPPED'
+                    ),
+
+                    array(
+                      'type' => 'text',
+                      'label' => $this->l('Column to be mapped:'),
+                      'name' => 'PAGGI_CPF_FIELD_COLUMN_MAPPED'
+                    ),
+
+                     array(
+                      'type' => 'text',
+                      'label' => $this->l('Customer\'s foreign key:'),
+                      'name' => 'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED',
+                      'desc' => $this->l('Foreign key with prestashop id_customer. Ex.: `id_mymodule_customer`')
                     ),
                    
                    ),

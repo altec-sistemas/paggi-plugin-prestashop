@@ -68,9 +68,24 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
         }
 
         if (!empty($this->module->key)) {
-            $this->paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
 
-            $this->displayChooseCard();
+            $cpf = $this->module->getCPF($customer->id);
+
+            if(empty($cpf)){
+
+                $this->errors[] = Tools::displayError($this->module->l('CPF is empty.'));
+
+                $this->displayNotConfig();
+
+            }else{
+
+                $this->paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer, $cpf);
+
+                $this->displayChooseCard();
+
+            }
+
+           
         } else {
             $this->displayNotConfig();
         }
