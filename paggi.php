@@ -259,7 +259,7 @@ class Paggi extends PaymentModule
     *
     * @return void
     */
-    public function hookActionOrderHistoryAddAfter($params)
+     public function hookActionOrderHistoryAddAfter($params)
     {
         $orderHistory = $params['order_history'];
 
@@ -267,27 +267,39 @@ class Paggi extends PaymentModule
 
         $orderPayment = $order->getOrderPayments();
 
-        $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
+        try{
 
-        $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));
-    
-        if (Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status != 'captured') {
-            $charge_captured = \Paggi\Charge::capture($charge->id);
+            $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
 
-            $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
-        } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && $charge->status != 'cancelled') {
-            $charge_cancel = \Paggi\Charge::cancel($charge->id);
-            $new_status = Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
-        }
+            $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));
+        
+            if (Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status == 'manual_clearing') {
+                $charge_captured = \Paggi\Charge::capture($charge->id);
 
-        if (is_int($new_status)) {
-            $orderHistory->id_order_state  = (int)$new_status;
-    
-            if ($orderHistory->update()) {
-                $order->current_state = $orderHistory->id_order_state;
-                $order->update();
+                $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
+            } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && $charge->status == 'manual_clearing') {
+                $charge_cancel = \Paggi\Charge::cancel($charge->id);
+                $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
             }
+
+        }catch(\Paggi\PaggiException $ex){
+
+            $this->displayError($this->l('Paggi server error.'));
+
+            PrestaShopLogger::addLog($ex->getMessage());
+
+            $new_status = (int) Configuration::get('PS_OS_ERROR');     
+
+           
         }
+
+        
+        $orderHistory->id_order_state  = (int) $new_status;
+
+        if ($orderHistory->update()) {
+            $order->current_state = $orderHistory->id_order_state;
+            $order->update();
+        }       
     }
 
 
