@@ -435,10 +435,153 @@ class Paggi extends PaymentModule
             Configuration::updateValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'));
 
 
+
+            if(Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1){
+
+
+                $this->activeMappedNative();
+
+            }else{
+
+                $this->desactiveMappedNative();
+
+            }
+
     
             $this->uploadImg();
         }
         $this->html .= $this->displayConfirmation($this->l('Settings updated'));
+    }
+
+
+
+    public function activeMappedNative(){
+
+        $this->desactiveMappedNative();
+
+        $this->addOverride("IdentityController");
+
+        $this->addOverride("AuthController");
+
+        $this->registerHook('displayCustomerIdentityForm');
+
+        $this->registerHook('createAccountForm');
+
+        $this->registerHook('actionCustomerAccountAdd');
+    }
+
+    public function desactiveMappedNative(){
+
+        $this->removeOverride("IdentityController");
+
+        $this->removeOverride("AuthController");
+
+        $this->unregisterHook('displayCustomerIdentityForm');
+
+        $this->unregisterHook('createAccountForm');
+
+        $this->unregisterHook('actionCustomerAccountAdd');
+
+    }
+
+
+    public function cpfValidation($item)
+    {
+        $nulos = array("12345678909","11111111111","22222222222","33333333333",
+            "44444444444","55555555555","66666666666", "77777777777",
+            "88888888888", "99999999999", "00000000000");
+        
+        /* Retira todos os caracteres que nao sejam 0-9 */
+        $cpf = preg_replace("/[^0-9]/", "", $item);
+
+        if (strlen($cpf) <> 11) {
+            throw new Exception($this->l('The CPF must contain 11 digits!'));
+        }
+        if (!is_numeric($cpf)) {
+            throw new Exception($this->l('Only numbers are accepted!'));
+        }
+
+        /* Retorna falso se o cpf for nulo*/
+        if (in_array($cpf, $nulos)) {
+            throw new Exception($this->l('Invalid CPF!'));
+        }
+
+        // if($this->checkDuplicate($cpf) !== false) {
+        //     throw new Exception('Este CPF já está cadastrado!');
+        // }
+        /*Calcula o penúltimo dígito verificador*/
+        $acum = 0;
+        for ($i = 0; $i < 9; $i++) {
+            $acum += $cpf[$i] * (10 - $i);
+        }
+
+        $x = $acum % 11;
+        $acum = ($x > 1) ? (11 - $x) : 0;
+        /* Retorna falso se o digito calculado eh diferente do passado na string */
+        if ($acum != $cpf[9]) {
+            throw new Exception($this->l('Invalid CPF. Please check!'));
+        }
+        /*Calcula o último dígito verificador*/
+        $acum = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $acum += $cpf[$i] * (11 - $i);
+        }
+
+        $x = $acum % 11;
+        $acum = ($x > 1) ? (11 - $x) : 0;
+        /* Retorna falso se o digito calculado eh diferente do passado na string */
+        if ($acum != $cpf[10]) {
+            throw new Exception($this->l('Invalid CPF. Please check!'));
+        }
+    }
+
+
+    public function hookcreateAccountForm(){
+
+        return $this->hookDisplayCustomerIdentityForm();
+
+    }
+
+    /**
+    * Hook executado após a inclusão do cliente
+    *
+    * @param $params
+    *
+    * @return bool
+    */
+    public function hookActionCustomerAccountAdd($params)
+    {
+        $postData = $params['_POST'];
+
+        $customer = $params['newCustomer'];
+
+        $cpf = $postData['cpf'];
+        
+        $numberDoc = preg_replace("/[^0-9]/", "", $cpf);       
+        
+        try {
+
+            PaggiCustomer::setCPFCustomerPS($customer, $numberDoc);
+
+            return true;
+        } catch (Exception $exc) {
+            return false;
+        }
+    }
+    public function hookDisplayCustomerIdentityForm(){
+
+        
+        $this->context->controller->addJS($this->_path . 'views/js/jquery.mask.min.js');
+     
+
+        $cpf = PaggiCustomer::getCPFByCustomerPS($this->context->customer);
+
+        $this->smarty->assign(array(
+            'urlValidateDoc' => $this->context->link->getModuleLink('paggi','validatedoc'),
+            'cpf' => $cpf
+        ));
+
+        return $this->display(__FILE__,'blockcpf.tpl');
     }
 
     /**
@@ -593,7 +736,7 @@ class Paggi extends PaymentModule
 
         if(Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1){
 
-
+            $cpf = PaggiCustomer::getCPFByCustomerPS($this->context->customer);
 
         }else{
 

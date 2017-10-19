@@ -48,6 +48,7 @@ class PaggiCustomer extends ObjectModel
     public $id;
     public $id_customer_paggi;
     public $id_customer_ps;
+    public $cpf;
     public $name;
     public $phone;
     public $email;
@@ -63,8 +64,9 @@ class PaggiCustomer extends ObjectModel
         'table' => 'paggi_customer',
         'primary' => 'id',
         'fields' => array(
-            'id_customer_paggi' =>  array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 255),
+            'id_customer_paggi' =>  array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 255),
              'id_customer_ps' =>  array('type' => self::TYPE_INT, 'validate' => 'isInt', 'required' => true),
+             'cpf' =>  array('type' =>self::TYPE_STRING, 'validate' => 'isGenericName'),
            
         ),
     );
@@ -81,6 +83,7 @@ class PaggiCustomer extends ObjectModel
         `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
           `id_customer_paggi` varchar(255) NOT NULL,
           `id_customer_ps` int(10) UNSIGNED NOT NULL,
+          `cpf` varchar(14),
           PRIMARY KEY (`id`)
         ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;
         ALTER TABLE `'._DB_PREFIX_.'paggi_customer` ADD CONSTRAINT `fk_customerpaggi_customerprestashop` FOREIGN KEY ( `id_customer` ) REFERENCES `'._DB_PREFIX_.'customer` ( ` id_customer ` );
@@ -119,26 +122,105 @@ class PaggiCustomer extends ObjectModel
 
         $result = Db::getInstance()->executeS($sql);
 
-        if (count($result) == 0) {
-            $params = array(
-                'name' =>$customer->firstname.' '.$customer->lastname,
-                'email' => $customer->email,
-                'document' =>$document
-            );
+
+        $params = array(
+           'name' =>$customer->firstname.' '.$customer->lastname,
+            'email' => $customer->email,
+            'document' =>$document
+        );
+
+
+        if (count($result)  > 0 && !empty($result[0]['id_customer_paggi']) ) {
+
+
+            $paggiCustomer = new PaggiCustomer($result[0]['id']);
+            $paggiCustomer->cpf = $document;
+
+            $paggiCustomer->update();
+
+            $customer_paggi = \Paggi\Customer::FindById($paggiCustomer->id_customer_paggi);
+
+            $customer_paggi->update($params);
+
+            
+        }else if(count($result)  > 0){
+
+
+            $paggiCustomer = new PaggiCustomer($result[0]['id']);
+            $paggiCustomer->cpf = $document;
+
+            $customer_paggi = \Paggi\Customer::create($params);
+
+            $paggiCustomer->id_customer_paggi = $customer_paggi->id;
+
+            $paggiCustomer->update();
+
+
+        }else {
+            
 
             $customer_paggi = \Paggi\Customer::create($params);
 
             $paggiCustomer = new PaggiCustomer();
             $paggiCustomer->id_customer_ps = $customer->id;
             $paggiCustomer->id_customer_paggi = $customer_paggi->id;
+            $paggiCustomer->cpf = $document;
+
+            $paggiCustomer->save();
+
+
+
+
+        }
+
+        
+
+        return $customer_paggi;
+    }
+
+
+
+    public static function setCPFCustomerPS($customer, $document){
+
+         $sql = 'SELECT * FROM `'._DB_PREFIX_.'paggi_customer` 
+        WHERE `id_customer_ps` = \''.$customer->id.'\'';
+
+        $result = Db::getInstance()->executeS($sql);
+
+        if (count($result) == 0) {
+            
+            $paggiCustomer = new PaggiCustomer();
+            $paggiCustomer->id_customer_ps = $customer->id;
+            $paggiCustomer->cpf = $document;
 
             $paggiCustomer->save();
         } else {
             $paggiCustomer = new PaggiCustomer($result[0]['id']);
-        }
+            $paggiCustomer->cpf = $document;
+            $paggiCustomer->update();
+        }      
 
-        $customer_paggi = \Paggi\Customer::FindById($paggiCustomer->id_customer_paggi);
+        
+    }
 
-        return $customer_paggi;
+
+
+    public static function getCPFByCustomerPS($customer){
+         
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'paggi_customer` 
+        WHERE `id_customer_ps` = \''.$customer->id.'\'';
+
+        $cpf = '';
+
+        $result = Db::getInstance()->executeS($sql);
+
+        if (count($result) > 0) {
+            
+           $paggiCustomer = new PaggiCustomer($result[0]['id']);
+           $cpf = $paggiCustomer->cpf;
+        } 
+
+
+        return $cpf;    
     }
 }

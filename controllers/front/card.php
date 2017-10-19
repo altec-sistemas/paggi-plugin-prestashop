@@ -92,8 +92,8 @@ class PaggiCardModuleFrontController extends ModuleFrontController
         $card_month = trim($card_expiration[0]);
         $card_year = trim($card_expiration[1]);
 
-
-        $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
+        $cpf = $this->module->getCPF($customer->id);
+        $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer, $cpf);
 
         //params create card
         $params = array(
