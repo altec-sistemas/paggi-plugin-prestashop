@@ -543,7 +543,7 @@ class Paggi extends PaymentModule
     }
 
     /**
-    * Hook executado após a inclusão do cliente
+    * Hook executed after client's inclusion
     *
     * @param $params
     *
