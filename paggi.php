@@ -274,11 +274,11 @@ class Paggi extends PaymentModule
             $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));
         
             if (Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status == 'manual_clearing') {
-                $charge_captured = \Paggi\Charge::capture($charge->id);
+                $charge_captured = $charge->capture();
 
                 $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
             } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && $charge->status == 'manual_clearing') {
-                $charge_cancel = \Paggi\Charge::cancel($charge->id);
+                $charge_cancel = $charge->cancel();
                 $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
             }
 
