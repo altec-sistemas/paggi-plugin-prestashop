@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 $content = <<<EOF
 <?php
@@ -21,4 +20,4 @@ $curl->post('https://api.github.com/gists', array(
     ),
 ));
 
-echo 'Gist created at '.$curl->response->html_url."\n";
+echo 'Gist created at ' . $curl->response->html_url . "\n";

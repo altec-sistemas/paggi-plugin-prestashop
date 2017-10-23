@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 const CLIENT_ID = 'XXXXXXXXXXXX.apps.googleusercontent.com';
 const CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXXXX';
@@ -19,7 +18,7 @@ if (isset($_GET['code'])) {
         'client_id' => CLIENT_ID,
         'client_secret' => CLIENT_SECRET,
         'redirect_uri' => implode('', array(
-            isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http',
+            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http',
             '://',
             $_SERVER['SERVER_NAME'],
             $_SERVER['SCRIPT_NAME'],
@@ -28,7 +27,7 @@ if (isset($_GET['code'])) {
     ));
 
     if ($curl->error) {
-        echo $curl->response->error.': '.$curl->response->error_description;
+        echo $curl->response->error . ': ' . $curl->response->error_description;
         exit;
     }
 
@@ -38,35 +37,35 @@ if (isset($_GET['code'])) {
     // Use the access token to send an email.
     $curl = new Curl();
     $curl->setHeader('Content-Type', 'message/rfc822');
-    $curl->setHeader('Authorization', 'OAuth '.$_SESSION['access_token']);
+    $curl->setHeader('Authorization', 'OAuth ' . $_SESSION['access_token']);
 
     $boundary = md5(time());
     $raw =
-        'MIME-Version: 1.0'."\r\n".
-        'Subject: hi'."\r\n".
-        'To: John Doe <jdoe@example.com>'."\r\n".
-        'Content-Type: multipart/alternative; boundary='.$boundary."\r\n".
-        "\r\n".
-        '--'.$boundary."\r\n".
-        'Content-Type: text/plain; charset=UTF-8'."\r\n".
-        "\r\n".
-        'hello, world'."\r\n".
-        "\r\n".
-        '--'.$boundary."\r\n".
-        'Content-Type: text/html; charset=UTF-8'."\r\n".
-        "\r\n".
-        '<em>hello, world</em>'."\r\n".
+        'MIME-Version: 1.0' . "\r\n" .
+        'Subject: hi' . "\r\n" .
+        'To: John Doe <jdoe@example.com>' . "\r\n" .
+        'Content-Type: multipart/alternative; boundary=' . $boundary . "\r\n" .
+        "\r\n" .
+        '--' . $boundary . "\r\n" .
+        'Content-Type: text/plain; charset=UTF-8' . "\r\n" .
+        "\r\n" .
+        'hello, world' . "\r\n" .
+        "\r\n" .
+        '--' . $boundary . "\r\n" .
+        'Content-Type: text/html; charset=UTF-8' . "\r\n" .
+        "\r\n" .
+        '<em>hello, world</em>' . "\r\n" .
         '';
 
     $curl->post('https://www.googleapis.com/upload/gmail/v1/users/me/messages/send', $raw);
 
-    echo 'Email '.$curl->response->id.' was sent.';
+    echo 'Email ' . $curl->response->id . ' was sent.';
 } else {
     $curl = new Curl();
     $curl->get('https://accounts.google.com/o/oauth2/auth', array(
         'scope' => 'https://www.googleapis.com/auth/gmail.compose',
         'redirect_uri' => implode('', array(
-            isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http',
+            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http',
             '://',
             $_SERVER['SERVER_NAME'],
             $_SERVER['SCRIPT_NAME'],
@@ -77,5 +76,5 @@ if (isset($_GET['code'])) {
     ));
 
     $url = $curl->responseHeaders['Location'];
-    echo '<a href="'.$url.'">Continue</a>';
+    echo '<a href="' . $url . '">Continue</a>';
 }

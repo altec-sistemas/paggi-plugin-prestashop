@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 // curl --request GET "https://httpbin.org/get?key=value"
 
@@ -12,8 +11,8 @@ $curl->get('https://httpbin.org/get', array(
 ));
 
 if ($curl->error) {
-    echo 'Error: '.$curl->errorCode.': '.$curl->errorMessage."\n";
+    echo 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage . "\n";
 } else {
-    echo 'Response:'."\n";
+    echo 'Response:' . "\n";
     var_dump($curl->response);
 }

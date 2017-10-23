@@ -83,12 +83,14 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
         $card_id = Tools::getValue('PAGGI_CHOOSE_CARD_ID');
         $installments_number = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
 
-        if (empty($card_id) || empty($installments_number)) {
+        $cpf = $this->module->getCPF($customer->id);
+
+        if (empty($card_id) || empty($installments_number) || empty($cpf)) {
             Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
         }
 
 
-        $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer);
+        $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer, $cpf);
 
         $currency = $this->context->currency;
         $total = $cart->getOrderTotal(true, Cart::BOTH);

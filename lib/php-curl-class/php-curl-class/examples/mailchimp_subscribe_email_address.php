@@ -1,19 +1,19 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 const MAILCHIMP_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXX';
 $parts = explode('-', MAILCHIMP_API_KEY);
-$MAILCHIMP_BASE_URL = 'https://'.$parts['1'].'.api.mailchimp.com/2.0/';
+$MAILCHIMP_BASE_URL = 'https://' . $parts['1'] . '.api.mailchimp.com/2.0/';
+
 
 $curl = new Curl();
-$curl->get($MAILCHIMP_BASE_URL.'/lists/list.json', array(
+$curl->get($MAILCHIMP_BASE_URL . '/lists/list.json', array(
     'apikey' => MAILCHIMP_API_KEY,
 ));
 
-if (0 === $curl->response->total) {
+if ($curl->response->total === 0) {
     echo 'No lists found';
     exit;
 }
@@ -21,7 +21,7 @@ if (0 === $curl->response->total) {
 $lists = $curl->response->data;
 $list = $lists['0'];
 
-$curl->post($MAILCHIMP_BASE_URL.'/lists/subscribe.json', array(
+$curl->post($MAILCHIMP_BASE_URL . '/lists/subscribe.json', array(
     'apikey' => MAILCHIMP_API_KEY,
     'id' => $list->id,
     'email' => array(
@@ -30,7 +30,7 @@ $curl->post($MAILCHIMP_BASE_URL.'/lists/subscribe.json', array(
 ));
 
 if ($curl->error) {
-    echo $curl->response->name.': '.$curl->response->error."\n";
+    echo $curl->response->name . ': ' . $curl->response->error . "\n";
 } else {
-    echo 'Subscribed '.$curl->response->email.'.'."\n";
+    echo 'Subscribed ' . $curl->response->email . '.' . "\n";
 }

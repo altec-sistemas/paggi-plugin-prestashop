@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 // curl --head "http://127.0.0.1:8000/?key=value"
 
@@ -12,8 +11,8 @@ $curl->head('http://127.0.0.1:8000/', array(
 ));
 
 if ($curl->error) {
-    echo 'Error: '.$curl->errorCode.': '.$curl->errorMessage."\n";
+    echo 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage . "\n";
 } else {
-    echo 'Response headers:'."\n";
+    echo 'Response headers:' . "\n";
     var_dump($curl->responseHeaders);
 }

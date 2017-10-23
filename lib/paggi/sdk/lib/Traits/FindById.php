@@ -25,4 +25,5 @@ trait FindById
 
         return self::manageResponse($curl);
     }
+
 }

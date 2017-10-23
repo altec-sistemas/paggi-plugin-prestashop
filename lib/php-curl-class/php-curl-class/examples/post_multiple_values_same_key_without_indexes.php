@@ -1,31 +1,28 @@
 <?php
-
 // keywords:
 // Django: MultiValueDict, QueryDict, request.GET.getlist(), request.POST.getlist(), urllib.urlencode, parse.urlencode
 // Java: request.getParameterValues()
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-use Curl\Curl;
+use \Curl\Curl;
 
 // curl "https://httpbin.org/post" -d "foo=bar&foo=baz"
 
-function http_build_query_without_indexes($query)
-{
+function http_build_query_without_indexes($query) {
     $array = array();
     foreach ($query as $key => $value) {
         $key = rawurlencode($key);
         if (is_array($value)) {
             foreach ($value as $v) {
                 $v = rawurlencode($v);
-                $array[] = $key.'='.$v;
+                $array[] = $key . '=' . $v;
             }
         } else {
             $value = rawurlencode($value);
-            $array[] = $key.'='.$value;
+            $array[] = $key . '=' . $value;
         }
     }
-
     return implode('&', $array);
 }
 

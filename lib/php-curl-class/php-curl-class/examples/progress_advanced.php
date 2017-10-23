@@ -1,12 +1,11 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 $curl = new Curl();
 $curl->progress(function ($client, $download_size, $downloaded, $upload_size, $uploaded) {
-    if (0 === $download_size) {
+    if ($download_size === 0) {
         return;
     }
 
@@ -16,16 +15,16 @@ $curl->progress(function ($client, $download_size, $downloaded, $upload_size, $u
     $dots = round($fraction_downloaded * $progress_size);
     printf('%3.0f%% [', $fraction_downloaded * 100);
     $i = 0;
-    for (; $i < $dots - 1; ++$i) {
+    for (; $i < $dots - 1; $i++) {
         echo '=';
     }
     echo '>';
-    for (; $i < $progress_size - 1; ++$i) {
+    for (; $i < $progress_size - 1; $i++) {
         echo ' ';
     }
-    echo ']'."\r";
+    echo ']' . "\r";
 });
 $curl->complete(function ($instance) {
-    echo "\n".'download complete'."\n";
+    echo "\n" . 'download complete' . "\n";
 });
 $curl->download('https://secure.php.net/distributions/manual/php_manual_en.html.gz', '/tmp/php_manual_en.html.gz');

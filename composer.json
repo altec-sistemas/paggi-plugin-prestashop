@@ -1,0 +1,9 @@
+{
+    "require": {
+        "paggi/sdk": "^1.2"
+    },
+
+    "config": {
+        "vendor-dir": "lib"
+    }
+}

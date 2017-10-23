@@ -1,16 +1,15 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 const API_KEY = '';
 const API_SECRET = '';
 
 $url = 'https://coinbase.com/api/v1/account/balance';
 
-$nonce = (int) (microtime(true) * 1e6);
-$message = $nonce.$url;
+$nonce = (int)(microtime(true) * 1e6);
+$message = $nonce . $url;
 $signature = hash_hmac('sha256', $message, API_SECRET);
 
 $curl = new Curl();
@@ -20,5 +19,5 @@ $curl->setHeader('ACCESS_NONCE', $nonce);
 $curl->get($url);
 
 echo
-    'My current account balance at Coinbase is '.
-    $curl->response->amount.' '.$curl->response->currency.'.'."\n";
+    'My current account balance at Coinbase is ' .
+    $curl->response->amount . ' ' . $curl->response->currency . '.' . "\n";

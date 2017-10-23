@@ -69,7 +69,10 @@ class PaggiPaymentModuleFrontController extends ModuleFrontController
 
         if (!empty($this->module->key)) {
 
+
+
             $cpf = $this->module->getCPF($customer->id);
+
 
             if(empty($cpf)){
 

@@ -1,10 +1,8 @@
 <?php
-
 // Receive PUT file.
 // See also "examples/put_large_file_chunked.php".
 
-function file_get_contents_chunked($filename, $chunk_size, $callback)
-{
+function file_get_contents_chunked($filename, $chunk_size, $callback) {
     $handle = fopen($filename, 'r');
     while (!feof($handle)) {
         call_user_func_array($callback, array(fread($handle, $chunk_size)));

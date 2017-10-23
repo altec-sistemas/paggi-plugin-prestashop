@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 $myfile = curl_file_create('cats.jpg', 'image/png', 'test_name');
 
@@ -18,7 +17,7 @@ $curl->post('https://httpbin.org/post', array(
 ));
 
 if ($curl->error) {
-    echo 'Error: '.$curl->errorCode.': '.$curl->errorMessage."\n";
+    echo 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage . "\n";
 } else {
-    echo 'Success'."\n";
+    echo 'Success' . "\n";
 }

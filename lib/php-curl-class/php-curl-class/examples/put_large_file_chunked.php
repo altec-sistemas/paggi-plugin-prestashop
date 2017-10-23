@@ -1,16 +1,13 @@
 <?php
-
 // PUT a file using chunked data.
 // See also "examples/receive_large_file_chunked.php".
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-use Curl\Curl;
+use \Curl\Curl;
 
-function read_file($ch, $fd, $length)
-{
+function read_file($ch, $fd, $length) {
     $data = fread($fd, $length);
-
     return $data;
 }
 
@@ -28,9 +25,9 @@ $curl->put('http://127.0.0.1:8000/');
 fclose($fp);
 
 if ($curl->error) {
-    echo 'Error: '.$curl->errorMessage."\n";
+    echo 'Error: ' . $curl->errorMessage . "\n";
 } else {
-    echo 'Success'."\n";
+    echo 'Success' . "\n";
 }
 
 // @codingStandardsIgnoreFile

@@ -2,9 +2,9 @@
 
 namespace CurlTest;
 
-use Curl\Curl;
-use Curl\MultiCurl;
-use Helper\Test;
+use \Curl\Curl;
+use \Curl\MultiCurl;
+use \Helper\Test;
 
 class MultiCurlTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,7 +64,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         ) {
             \PHPUnit\Framework\Assert::assertInstanceOf('Curl\Curl', $instance);
             $request_method = $instance->getOpt(CURLOPT_CUSTOMREQUEST);
-            if ('DELETE' === $request_method) {
+            if ($request_method === 'DELETE') {
                 \PHPUnit\Framework\Assert::assertFalse($delete_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_error_called);
@@ -77,42 +77,42 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 \PHPUnit\Framework\Assert::assertFalse($download_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($download_complete_called);
                 $download_before_send_called = true;
-            } elseif ('GET' === $request_method) {
+            } elseif ($request_method === 'GET') {
                 \PHPUnit\Framework\Assert::assertFalse($get_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_complete_called);
                 $get_before_send_called = true;
             }
-            if ('HEAD' === $request_method) {
+            if ($request_method === 'HEAD') {
                 \PHPUnit\Framework\Assert::assertFalse($head_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_complete_called);
                 $head_before_send_called = true;
             }
-            if ('OPTIONS' === $request_method) {
+            if ($request_method === 'OPTIONS') {
                 \PHPUnit\Framework\Assert::assertFalse($options_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_complete_called);
                 $options_before_send_called = true;
             }
-            if ('PATCH' === $request_method) {
+            if ($request_method === 'PATCH') {
                 \PHPUnit\Framework\Assert::assertFalse($patch_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_complete_called);
                 $patch_before_send_called = true;
             }
-            if ('POST' === $request_method) {
+            if ($request_method === 'POST') {
                 \PHPUnit\Framework\Assert::assertFalse($post_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_complete_called);
                 $post_before_send_called = true;
             }
-            if ('PUT' === $request_method) {
+            if ($request_method === 'PUT') {
                 \PHPUnit\Framework\Assert::assertFalse($put_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_error_called);
@@ -133,7 +133,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         ) {
             \PHPUnit\Framework\Assert::assertInstanceOf('Curl\Curl', $instance);
             $request_method = $instance->getOpt(CURLOPT_CUSTOMREQUEST);
-            if ('DELETE' === $request_method) {
+            if ($request_method === 'DELETE') {
                 \PHPUnit\Framework\Assert::assertTrue($delete_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_error_called);
@@ -146,42 +146,42 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 \PHPUnit\Framework\Assert::assertFalse($download_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($download_complete_called);
                 $download_success_called = true;
-            } elseif ('GET' === $request_method) {
+            } elseif ($request_method === 'GET') {
                 \PHPUnit\Framework\Assert::assertTrue($get_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_complete_called);
                 $get_success_called = true;
             }
-            if ('HEAD' === $request_method) {
+            if ($request_method === 'HEAD') {
                 \PHPUnit\Framework\Assert::assertTrue($head_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_complete_called);
                 $head_success_called = true;
             }
-            if ('OPTIONS' === $request_method) {
+            if ($request_method === 'OPTIONS') {
                 \PHPUnit\Framework\Assert::assertTrue($options_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_complete_called);
                 $options_success_called = true;
             }
-            if ('PATCH' === $request_method) {
+            if ($request_method === 'PATCH') {
                 \PHPUnit\Framework\Assert::assertTrue($patch_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_complete_called);
                 $patch_success_called = true;
             }
-            if ('POST' === $request_method) {
+            if ($request_method === 'POST') {
                 \PHPUnit\Framework\Assert::assertTrue($post_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_complete_called);
                 $post_success_called = true;
             }
-            if ('PUT' === $request_method) {
+            if ($request_method === 'PUT') {
                 \PHPUnit\Framework\Assert::assertTrue($put_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_error_called);
@@ -221,7 +221,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         ) {
             \PHPUnit\Framework\Assert::assertInstanceOf('Curl\Curl', $instance);
             $request_method = $instance->getOpt(CURLOPT_CUSTOMREQUEST);
-            if ('DELETE' === $request_method) {
+            if ($request_method === 'DELETE') {
                 \PHPUnit\Framework\Assert::assertTrue($delete_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($delete_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_error_called);
@@ -234,42 +234,42 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 \PHPUnit\Framework\Assert::assertFalse($download_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($download_complete_called);
                 $download_complete_called = true;
-            } elseif ('GET' === $request_method) {
+            } elseif ($request_method === 'GET') {
                 \PHPUnit\Framework\Assert::assertTrue($get_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($get_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_complete_called);
                 $get_complete_called = true;
             }
-            if ('HEAD' === $request_method) {
+            if ($request_method === 'HEAD') {
                 \PHPUnit\Framework\Assert::assertTrue($head_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($head_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_complete_called);
                 $head_complete_called = true;
             }
-            if ('OPTIONS' === $request_method) {
+            if ($request_method === 'OPTIONS') {
                 \PHPUnit\Framework\Assert::assertTrue($options_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($options_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_complete_called);
                 $options_complete_called = true;
             }
-            if ('PATCH' === $request_method) {
+            if ($request_method === 'PATCH') {
                 \PHPUnit\Framework\Assert::assertTrue($patch_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($patch_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_complete_called);
                 $patch_complete_called = true;
             }
-            if ('POST' === $request_method) {
+            if ($request_method === 'POST') {
                 \PHPUnit\Framework\Assert::assertTrue($post_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($post_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_complete_called);
                 $post_complete_called = true;
             }
-            if ('PUT' === $request_method) {
+            if ($request_method === 'PUT') {
                 \PHPUnit\Framework\Assert::assertTrue($put_before_send_called);
                 \PHPUnit\Framework\Assert::assertTrue($put_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_error_called);
@@ -387,7 +387,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         ) {
             \PHPUnit\Framework\Assert::assertInstanceOf('Curl\Curl', $instance);
             $request_method = $instance->getOpt(CURLOPT_CUSTOMREQUEST);
-            if ('DELETE' === $request_method) {
+            if ($request_method === 'DELETE') {
                 \PHPUnit\Framework\Assert::assertFalse($delete_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_error_called);
@@ -400,42 +400,42 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 \PHPUnit\Framework\Assert::assertFalse($download_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($download_complete_called);
                 $download_before_send_called = true;
-            } elseif ('GET' === $request_method) {
+            } elseif ($request_method === 'GET') {
                 \PHPUnit\Framework\Assert::assertFalse($get_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_complete_called);
                 $get_before_send_called = true;
             }
-            if ('HEAD' === $request_method) {
+            if ($request_method === 'HEAD') {
                 \PHPUnit\Framework\Assert::assertFalse($head_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_complete_called);
                 $head_before_send_called = true;
             }
-            if ('OPTIONS' === $request_method) {
+            if ($request_method === 'OPTIONS') {
                 \PHPUnit\Framework\Assert::assertFalse($options_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_complete_called);
                 $options_before_send_called = true;
             }
-            if ('PATCH' === $request_method) {
+            if ($request_method === 'PATCH') {
                 \PHPUnit\Framework\Assert::assertFalse($patch_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_complete_called);
                 $patch_before_send_called = true;
             }
-            if ('POST' === $request_method) {
+            if ($request_method === 'POST') {
                 \PHPUnit\Framework\Assert::assertFalse($post_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_complete_called);
                 $post_before_send_called = true;
             }
-            if ('PUT' === $request_method) {
+            if ($request_method === 'PUT') {
                 \PHPUnit\Framework\Assert::assertFalse($put_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_error_called);
@@ -474,7 +474,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         ) {
             \PHPUnit\Framework\Assert::assertInstanceOf('Curl\Curl', $instance);
             $request_method = $instance->getOpt(CURLOPT_CUSTOMREQUEST);
-            if ('DELETE' === $request_method) {
+            if ($request_method === 'DELETE') {
                 \PHPUnit\Framework\Assert::assertTrue($delete_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_error_called);
@@ -487,42 +487,42 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 \PHPUnit\Framework\Assert::assertFalse($download_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($download_complete_called);
                 $download_error_called = true;
-            } elseif ('GET' === $request_method) {
+            } elseif ($request_method === 'GET') {
                 \PHPUnit\Framework\Assert::assertTrue($get_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_complete_called);
                 $get_error_called = true;
             }
-            if ('HEAD' === $request_method) {
+            if ($request_method === 'HEAD') {
                 \PHPUnit\Framework\Assert::assertTrue($head_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_complete_called);
                 $head_error_called = true;
             }
-            if ('OPTIONS' === $request_method) {
+            if ($request_method === 'OPTIONS') {
                 \PHPUnit\Framework\Assert::assertTrue($options_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_complete_called);
                 $options_error_called = true;
             }
-            if ('PATCH' === $request_method) {
+            if ($request_method === 'PATCH') {
                 \PHPUnit\Framework\Assert::assertTrue($patch_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_complete_called);
                 $patch_error_called = true;
             }
-            if ('POST' === $request_method) {
+            if ($request_method === 'POST') {
                 \PHPUnit\Framework\Assert::assertTrue($post_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_complete_called);
                 $post_error_called = true;
             }
-            if ('PUT' === $request_method) {
+            if ($request_method === 'PUT') {
                 \PHPUnit\Framework\Assert::assertTrue($put_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_success_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_error_called);
@@ -543,7 +543,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         ) {
             \PHPUnit\Framework\Assert::assertInstanceOf('Curl\Curl', $instance);
             $request_method = $instance->getOpt(CURLOPT_CUSTOMREQUEST);
-            if ('DELETE' === $request_method) {
+            if ($request_method === 'DELETE') {
                 \PHPUnit\Framework\Assert::assertTrue($delete_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($delete_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($delete_error_called);
@@ -556,42 +556,42 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 \PHPUnit\Framework\Assert::assertTrue($download_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($download_complete_called);
                 $download_complete_called = true;
-            } elseif ('GET' === $request_method) {
+            } elseif ($request_method === 'GET') {
                 \PHPUnit\Framework\Assert::assertTrue($get_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($get_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($get_complete_called);
                 $get_complete_called = true;
             }
-            if ('HEAD' === $request_method) {
+            if ($request_method === 'HEAD') {
                 \PHPUnit\Framework\Assert::assertTrue($head_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($head_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($head_complete_called);
                 $head_complete_called = true;
             }
-            if ('OPTIONS' === $request_method) {
+            if ($request_method === 'OPTIONS') {
                 \PHPUnit\Framework\Assert::assertTrue($options_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($options_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($options_complete_called);
                 $options_complete_called = true;
             }
-            if ('PATCH' === $request_method) {
+            if ($request_method === 'PATCH') {
                 \PHPUnit\Framework\Assert::assertTrue($patch_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($patch_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($patch_complete_called);
                 $patch_complete_called = true;
             }
-            if ('POST' === $request_method) {
+            if ($request_method === 'POST') {
                 \PHPUnit\Framework\Assert::assertTrue($post_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($post_error_called);
                 \PHPUnit\Framework\Assert::assertFalse($post_complete_called);
                 $post_complete_called = true;
             }
-            if ('PUT' === $request_method) {
+            if ($request_method === 'PUT') {
                 \PHPUnit\Framework\Assert::assertTrue($put_before_send_called);
                 \PHPUnit\Framework\Assert::assertFalse($put_success_called);
                 \PHPUnit\Framework\Assert::assertTrue($put_error_called);
@@ -2103,6 +2103,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
 
         $multi_curl->start();
 
+
         $multi_curl = new MultiCurl();
         $multi_curl->setHeader('X-DEBUG-TEST', 'json_response');
         $multi_curl->setJsonDecoder(function ($response) {
@@ -2136,6 +2137,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foo', $get_1->response);
         $this->assertEquals('bar', $get_2->response);
 
+
         $multi_curl = new MultiCurl();
         $multi_curl->setHeader('X-DEBUG-TEST', 'json_response');
         $multi_curl->setJsonDecoder(false);
@@ -2157,7 +2159,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $post_1->complete(function ($instance) {
             \PHPUnit\Framework\Assert::assertTrue(is_object($instance->response));
             \PHPUnit\Framework\Assert::assertInstanceOf('SimpleXMLElement', $instance->response);
-            \PHPUnit\Framework\Assert::assertFalse(false === strpos($instance->response->saveXML(), '<![CDATA['));
+            \PHPUnit\Framework\Assert::assertFalse(strpos($instance->response->saveXML(), '<![CDATA[') === false);
         });
 
         $post_2 = $multi_curl->addPost(Test::TEST_URL);
@@ -2167,7 +2169,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $post_2->complete(function ($instance) {
             \PHPUnit\Framework\Assert::assertTrue(is_object($instance->response));
             \PHPUnit\Framework\Assert::assertInstanceOf('SimpleXMLElement', $instance->response);
-            \PHPUnit\Framework\Assert::assertTrue(false === strpos($instance->response->saveXML(), '<![CDATA['));
+            \PHPUnit\Framework\Assert::assertTrue(strpos($instance->response->saveXML(), '<![CDATA[') === false);
         });
 
         $post_3 = $multi_curl->addPost(Test::TEST_URL);
@@ -2177,6 +2179,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         });
 
         $multi_curl->start();
+
 
         $multi_curl = new MultiCurl();
         $multi_curl->setHeader('X-DEBUG-TEST', 'xml_with_cdata_response');
@@ -2211,6 +2214,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foo', $get_1->response);
         $this->assertEquals('bar', $get_2->response);
 
+
         $multi_curl = new MultiCurl();
         $multi_curl->setHeader('X-DEBUG-TEST', 'xml_with_cdata_response');
         $multi_curl->setXmlDecoder(false);
@@ -2229,7 +2233,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $upload_file_path = \Helper\get_png();
         $upload_test = new Test();
         $upload_test->server('upload_response', 'POST', array(
-            'image' => '@'.$upload_file_path,
+            'image' => '@' . $upload_file_path,
         ));
         $uploaded_file_path = $upload_test->curl->response->file_path;
 
@@ -2237,7 +2241,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $download_callback_called = false;
         $multi_curl = new MultiCurl();
         $multi_curl->setHeader('X-DEBUG-TEST', 'download_response');
-        $multi_curl->addDownload(Test::TEST_URL.'?'.http_build_query(array(
+        $multi_curl->addDownload(Test::TEST_URL . '?' . http_build_query(array(
             'file_path' => $uploaded_file_path,
         )), function ($instance, $fh) use (&$download_callback_called) {
             \PHPUnit\Framework\Assert::assertFalse($download_callback_called);
@@ -2365,7 +2369,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 'DELETE /?key=value HTTP/1.1',
                 $instance->requestHeaders['Request-Line']
             );
-            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL.'?key=value', $instance->effectiveUrl);
+            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL . '?key=value', $instance->effectiveUrl);
         });
         $multi_curl->start();
 
@@ -2376,7 +2380,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 'GET /?key=value HTTP/1.1',
                 $instance->requestHeaders['Request-Line']
             );
-            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL.'?key=value', $instance->effectiveUrl);
+            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL . '?key=value', $instance->effectiveUrl);
         });
         $multi_curl->start();
 
@@ -2387,7 +2391,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 'HEAD /?key=value HTTP/1.1',
                 $instance->requestHeaders['Request-Line']
             );
-            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL.'?key=value', $instance->effectiveUrl);
+            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL . '?key=value', $instance->effectiveUrl);
         });
         $multi_curl->start();
 
@@ -2398,7 +2402,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
                 'OPTIONS /?key=value HTTP/1.1',
                 $instance->requestHeaders['Request-Line']
             );
-            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL.'?key=value', $instance->effectiveUrl);
+            \PHPUnit\Framework\Assert::assertEquals(Test::TEST_URL . '?key=value', $instance->effectiveUrl);
         });
 
         $multi_curl = new MultiCurl();
@@ -2438,8 +2442,8 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
 
         $urls = array();
         $copy_of_urls = array();
-        for ($i = 0; $i < 10; ++$i) {
-            $url = Test::TEST_URL.'?'.md5(mt_rand());
+        for ($i = 0; $i < 10; $i++) {
+            $url = Test::TEST_URL . '?' . md5(mt_rand());
             $urls[] = $url;
             $copy_of_urls[] = $url;
         }
@@ -2448,7 +2452,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $multi_curl->complete(function ($instance) use (&$multi_curl, &$urls, &$urls_called) {
             $urls_called[] = $instance->url;
             $next_url = array_pop($urls);
-            if (!(null === $next_url)) {
+            if (!($next_url === null)) {
                 $multi_curl->addGet($next_url);
             }
         });
@@ -2498,6 +2502,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
 
     public function testAlternativeStandardErrorOutput()
     {
+
         $buffer = fopen('php://memory', 'w+');
 
         $multi_curl = new MultiCurl();
@@ -2561,7 +2566,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
             \PHPUnit\Framework\Assert::assertEquals($sequential_id, $instance->id);
         });
 
-        for ($i = 0; $i < 100; ++$i) {
+        for ($i = 0; $i < 100; $i++) {
             $multi_curl->addPost(Test::TEST_URL, $i);
         }
 
@@ -2576,10 +2581,10 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
         $multi_curl->complete(function ($instance) use (&$counter) {
             $sequential_id = $instance->getOpt(CURLOPT_POSTFIELDS);
             \PHPUnit\Framework\Assert::assertEquals($counter, $sequential_id);
-            ++$counter;
+            $counter++;
         });
 
-        for ($i = 0; $i < 100; ++$i) {
+        for ($i = 0; $i < 100; $i++) {
             $multi_curl->addPost(Test::TEST_URL, $i);
         }
 
@@ -2650,7 +2655,7 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
             $multi_curl->setOpt(CURLOPT_COOKIEJAR, '/dev/null');
             $multi_curl->setHeader('X-DEBUG-TEST', 'retry');
 
-            if (!(null === $maximum_number_of_retries)) {
+            if (!($maximum_number_of_retries === null)) {
                 $multi_curl->setRetry($maximum_number_of_retries);
             }
 
@@ -2727,10 +2732,9 @@ class MultiCurlTest extends \PHPUnit\Framework\TestCase
             $multi_curl->setOpt(CURLOPT_COOKIEJAR, '/dev/null');
             $multi_curl->setHeader('X-DEBUG-TEST', 'retry');
 
-            if (!(null === $maximum_number_of_retries)) {
+            if (!($maximum_number_of_retries === null)) {
                 $multi_curl->setRetry(function ($instance) use ($maximum_number_of_retries) {
                     $return = $instance->retries < $maximum_number_of_retries;
-
                     return $return;
                 });
             }

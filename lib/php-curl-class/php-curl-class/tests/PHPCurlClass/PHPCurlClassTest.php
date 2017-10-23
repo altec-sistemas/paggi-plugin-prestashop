@@ -2,9 +2,9 @@
 
 namespace CurlTest;
 
-use Curl\Curl;
-use Curl\CaseInsensitiveArray;
-use Helper\Test;
+use \Curl\Curl;
+use \Curl\CaseInsensitiveArray;
+use \Helper\Test;
 
 class CurlTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,7 +37,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $array = new CaseInsensitiveArray();
         $this->assertTrue(is_object($array));
         $this->assertCount(0, $array);
-        $this->assertNull($array[(string) rand()]);
+        $this->assertNull($array[(string)rand()]);
 
         $array['foo'] = 'bar';
         $this->assertNotEmpty($array);
@@ -82,14 +82,14 @@ class CurlTest extends \PHPUnit\Framework\TestCase
 
     public function testUserAgent()
     {
-        $php_version = preg_replace('/([\.\+\?\*\(\)\[\]\^\$\/])/', '\\\\\1', 'PHP/'.PHP_VERSION);
+        $php_version = preg_replace('/([\.\+\?\*\(\)\[\]\^\$\/])/', '\\\\\1', 'PHP/' . PHP_VERSION);
         $curl_version = curl_version();
-        $curl_version = 'curl\/'.$curl_version['version'];
+        $curl_version = 'curl\/' . $curl_version['version'];
 
         $test = new Test();
         $user_agent = $test->server('server', 'GET', array('key' => 'HTTP_USER_AGENT'));
-        $this->assertRegExp('/'.$php_version.'/', $user_agent);
-        $this->assertRegExp('/'.$curl_version.'/', $user_agent);
+        $this->assertRegExp('/' . $php_version . '/', $user_agent);
+        $this->assertRegExp('/' . $curl_version . '/', $user_agent);
     }
 
     public function testGet()
@@ -106,7 +106,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $test = new Test();
         $test->server('server', 'GET', $data);
         $this->assertEquals(Test::TEST_URL, $test->curl->baseUrl);
-        $this->assertEquals(Test::TEST_URL.'?'.http_build_query($data), $test->curl->url);
+        $this->assertEquals(Test::TEST_URL . '?' . http_build_query($data), $test->curl->url);
 
         // curl -v --request POST "http://127.0.0.1:8000/" --data "foo=bar"
         $test = new Test();
@@ -130,19 +130,19 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $test = new Test();
         $test->server('server', 'DELETE', $data);
         $this->assertEquals(Test::TEST_URL, $test->curl->baseUrl);
-        $this->assertEquals(Test::TEST_URL.'?'.http_build_query($data), $test->curl->url);
+        $this->assertEquals(Test::TEST_URL . '?' . http_build_query($data), $test->curl->url);
 
         // curl -v --get --request HEAD --head "http://127.0.0.1:8000/" --data "foo=bar"
         $test = new Test();
         $test->server('server', 'HEAD', $data);
         $this->assertEquals(Test::TEST_URL, $test->curl->baseUrl);
-        $this->assertEquals(Test::TEST_URL.'?'.http_build_query($data), $test->curl->url);
+        $this->assertEquals(Test::TEST_URL . '?' . http_build_query($data), $test->curl->url);
 
         // curl -v --get --request OPTIONS "http://127.0.0.1:8000/" --data "foo=bar"
         $test = new Test();
         $test->server('server', 'OPTIONS', $data);
         $this->assertEquals(Test::TEST_URL, $test->curl->baseUrl);
-        $this->assertEquals(Test::TEST_URL.'?'.http_build_query($data), $test->curl->url);
+        $this->assertEquals(Test::TEST_URL . '?' . http_build_query($data), $test->curl->url);
     }
 
     public function testSetUrlInConstructor()
@@ -206,25 +206,25 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $curl->setUrl(Test::TEST_URL);
         $curl->delete($data);
         $this->assertEquals('DELETE /?key=value HTTP/1.1', $curl->requestHeaders['Request-Line']);
-        $this->assertEquals(Test::TEST_URL.'?key=value', $curl->effectiveUrl);
+        $this->assertEquals(Test::TEST_URL . '?key=value', $curl->effectiveUrl);
 
         $curl = new Curl();
         $curl->setUrl(Test::TEST_URL);
         $curl->get($data);
         $this->assertEquals('GET /?key=value HTTP/1.1', $curl->requestHeaders['Request-Line']);
-        $this->assertEquals(Test::TEST_URL.'?key=value', $curl->effectiveUrl);
+        $this->assertEquals(Test::TEST_URL . '?key=value', $curl->effectiveUrl);
 
         $curl = new Curl();
         $curl->setUrl(Test::TEST_URL);
         $curl->head($data);
         $this->assertEquals('HEAD /?key=value HTTP/1.1', $curl->requestHeaders['Request-Line']);
-        $this->assertEquals(Test::TEST_URL.'?key=value', $curl->effectiveUrl);
+        $this->assertEquals(Test::TEST_URL . '?key=value', $curl->effectiveUrl);
 
         $curl = new Curl();
         $curl->setUrl(Test::TEST_URL);
         $curl->options($data);
         $this->assertEquals('OPTIONS /?key=value HTTP/1.1', $curl->requestHeaders['Request-Line']);
-        $this->assertEquals(Test::TEST_URL.'?key=value', $curl->effectiveUrl);
+        $this->assertEquals(Test::TEST_URL . '?key=value', $curl->effectiveUrl);
 
         $curl = new Curl();
         $curl->setUrl(Test::TEST_URL);
@@ -254,7 +254,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $test = new Test();
         $test->curl->setOpt(CURLOPT_FOLLOWLOCATION, true);
         $test->server('redirect', 'GET');
-        $this->assertEquals(Test::TEST_URL.'?redirect', $test->curl->effectiveUrl);
+        $this->assertEquals(Test::TEST_URL . '?redirect', $test->curl->effectiveUrl);
     }
 
     public function testPostRequestMethod()
@@ -271,18 +271,18 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         // consisting only of the Status-Line and optional headers, and is
         // terminated by an empty line.
         $response =
-            'HTTP/1.1 100 Continue'."\r\n".
-            'Date: Fri, 01 Jan 1990 00:00:00 GMT'."\r\n".
-            'Server: PHP-Curl-Class'."\r\n".
-            "\r\n".
-            'HTTP/1.1 200 OK'."\r\n".
-            'Date: Fri, 01 Jan 1990 00:00:00 GMT'."\r\n".
-            'Cache-Control: private'."\r\n".
-            'Vary: Accept-Encoding'."\r\n".
-            'Content-Length: 2'."\r\n".
-            'Content-Type: text/plain;charset=UTF-8'."\r\n".
-            'Server: PHP-Curl-Class'."\r\n".
-            'Connection: keep-alive'."\r\n".
+            'HTTP/1.1 100 Continue' . "\r\n" .
+            'Date: Fri, 01 Jan 1990 00:00:00 GMT' . "\r\n" .
+            'Server: PHP-Curl-Class' . "\r\n" .
+            "\r\n" .
+            'HTTP/1.1 200 OK' . "\r\n" .
+            'Date: Fri, 01 Jan 1990 00:00:00 GMT' . "\r\n" .
+            'Cache-Control: private' . "\r\n" .
+            'Vary: Accept-Encoding' . "\r\n" .
+            'Content-Length: 2' . "\r\n" .
+            'Content-Type: text/plain;charset=UTF-8' . "\r\n" .
+            'Server: PHP-Curl-Class' . "\r\n" .
+            'Connection: keep-alive' . "\r\n" .
             "\r\n";
 
         $reflector = new \ReflectionClass('\Curl\Curl');
@@ -333,7 +333,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         foreach ($test_data as $data) {
             $test = new Test();
             list($post_data, $expected_content_length) = $data;
-            if (false === $post_data) {
+            if ($post_data === false) {
                 $test->server('post', 'POST');
             } else {
                 $test->server('post', 'POST', $post_data);
@@ -371,7 +371,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $file_path_1 = \Helper\get_png();
         $tests[] = array(
             'file_path' => $file_path_1,
-            'post_data_image' => '@'.$file_path_1,
+            'post_data_image' => '@' . $file_path_1,
         );
 
         if (class_exists('CURLFile')) {
@@ -433,7 +433,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $test = new Test();
         $this->assertEquals('image/png', $test->server('post_file_path_upload', 'POST', array(
             'key' => 'image',
-            'image' => '@'.$file_path,
+            'image' => '@' . $file_path,
         )));
 
         unlink($file_path);
@@ -619,7 +619,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $downloaded_file_path = tempnam('/tmp', 'php-curl-class.');
         $download_test = new Test();
         $download_test->curl->setHeader('X-DEBUG-TEST', 'download_response');
-        $this->assertTrue($download_test->curl->download(Test::TEST_URL.'?'.http_build_query(array(
+        $this->assertTrue($download_test->curl->download(Test::TEST_URL . '?' . http_build_query(array(
             'file_path' => $uploaded_file_path,
         )), $downloaded_file_path));
         $this->assertNotEquals($uploaded_file_path, $downloaded_file_path);
@@ -652,7 +652,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $callback_called = false;
         $curl = new Curl();
         $curl->setHeader('X-DEBUG-TEST', 'download_response');
-        $curl->download(Test::TEST_URL.'?'.http_build_query(array(
+        $curl->download(Test::TEST_URL . '?' . http_build_query(array(
             'file_path' => $uploaded_file_path,
         )), function ($instance, $fh) use (&$callback_called) {
             \PHPUnit\Framework\Assert::assertFalse($callback_called);
@@ -711,20 +711,21 @@ class CurlTest extends \PHPUnit\Framework\TestCase
                 $filesize + 1,
                 $filesize + 2,
                 $filesize + 3,
+
             ) as $length) {
             $source = Test::TEST_URL;
             $destination = \Helper\get_tmp_file_path();
 
             // Start with no file.
-            if (false === $length) {
+            if ($length === false) {
                 $this->assertFalse(file_exists($destination));
 
-                // Start with $length bytes of file.
+            // Start with $length bytes of file.
             } else {
                 // Simulate resuming partially downloaded temporary file.
-                $partial_filename = $destination.'.pccdownload';
+                $partial_filename = $destination . '.pccdownload';
 
-                if (0 === $length) {
+                if ($length === 0) {
                     $partial_content = '';
                 } else {
                     $file = fopen($filename, 'rb');
@@ -736,7 +737,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
                 if ($length <= $filesize) {
                     $this->assertEquals($length, strlen($partial_content));
 
-                    // Partial content should not be larger than the original file size.
+                // Partial content should not be larger than the original file size.
                 } else {
                     $this->assertEquals($filesize, strlen($partial_content));
                 }
@@ -748,7 +749,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             // Download (the remaining bytes of) the file.
             $curl = new Curl();
             $curl->setHeader('X-DEBUG-TEST', 'download_file_range');
-            $curl->download($source.'?'.http_build_query(array(
+            $curl->download($source . '?' . http_build_query(array(
                 'file_path' => $uploaded_file_path,
             )), $destination);
 
@@ -756,7 +757,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
 
             $expected_bytes_downloaded = $filesize - min($length, $filesize);
             $bytes_downloaded = $curl->responseHeaders['content-length'];
-            if (false === $length || 0 === $length) {
+            if ($length === false || $length === 0) {
                 $expected_http_status_code = 200; // 200 OK
                 $this->assertEquals($expected_bytes_downloaded, $bytes_downloaded);
             } elseif ($length >= $filesize) {
@@ -858,7 +859,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             $expect_error = $test['expect_error'];
 
             $test = new Test();
-            if (!(false === $max_filesize)) {
+            if (!($max_filesize === false)) {
                 $test->curl->setMaxFilesize($max_filesize);
             }
             $test->server('download_file_size', 'GET', array(
@@ -1006,7 +1007,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
 
     public function testCookieFile()
     {
-        $cookie_file = dirname(__FILE__).'/cookiefile.txt';
+        $cookie_file = dirname(__FILE__) . '/cookiefile.txt';
         $cookie_data = implode("\t", array(
             '127.0.0.1', // domain
             'FALSE',     // tailmatch
@@ -1015,7 +1016,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             '0',         // expires
             'mycookie',  // name
             'yum',       // value
-        ))."\n";
+        )) . "\n";
         file_put_contents($cookie_file, $cookie_data);
 
         $test = new Test();
@@ -1031,14 +1032,14 @@ class CurlTest extends \PHPUnit\Framework\TestCase
 
     public function testCookieJar()
     {
-        $cookie_jar = dirname(__FILE__).'/cookiejar.txt';
+        $cookie_jar = dirname(__FILE__) . '/cookiejar.txt';
 
         $test = new Test();
         $test->curl->setCookieJar($cookie_jar);
         $test->server('cookiejar', 'GET');
         $test->curl->close();
 
-        $this->assertTrue(!(false === strpos(file_get_contents($cookie_jar), "\t".'mycookie'."\t".'yum')));
+        $this->assertTrue(!(strpos(file_get_contents($cookie_jar), "\t" . 'mycookie' . "\t" . 'yum') === false));
         unlink($cookie_jar);
         $this->assertFalse(file_exists($cookie_jar));
     }
@@ -1196,15 +1197,15 @@ class CurlTest extends \PHPUnit\Framework\TestCase
     public function testRequestUrl()
     {
         $test = new Test();
-        $this->assertFalse('?' === substr($test->server('request_uri', 'GET'), -1));
+        $this->assertFalse(substr($test->server('request_uri', 'GET'), -1) === '?');
         $test = new Test();
-        $this->assertFalse('?' === substr($test->server('request_uri', 'POST'), -1));
+        $this->assertFalse(substr($test->server('request_uri', 'POST'), -1) === '?');
         $test = new Test();
-        $this->assertFalse('?' === substr($test->server('request_uri', 'PUT'), -1));
+        $this->assertFalse(substr($test->server('request_uri', 'PUT'), -1) === '?');
         $test = new Test();
-        $this->assertFalse('?' === substr($test->server('request_uri', 'PATCH'), -1));
+        $this->assertFalse(substr($test->server('request_uri', 'PATCH'), -1) === '?');
         $test = new Test();
-        $this->assertFalse('?' === substr($test->server('request_uri', 'DELETE'), -1));
+        $this->assertFalse(substr($test->server('request_uri', 'DELETE'), -1) === '?');
     }
 
     public function testNestedData()
@@ -1247,7 +1248,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
 
         $test = new Test();
         $test->server('server', 'POST', array(
-            'image' => '@'.$file_path,
+            'image' => '@' . $file_path,
         ));
         $this->assertEquals('100-continue', $test->curl->requestHeaders['Expect']);
         preg_match('/^multipart\/form-data; boundary=/', $test->curl->requestHeaders['Content-Type'], $content_type);
@@ -1273,7 +1274,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         preg_match('/^multipart\/form-data; boundary=/', $test->curl->requestHeaders['Content-Type'], $content_type);
         $this->assertTrue(!empty($content_type));
 
-        unlink($file_path);
+        unlink($file_path) ;
         $this->assertFalse(file_exists($file_path));
     }
 
@@ -1306,7 +1307,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             foreach (array(
                 'Content-Type',
                 'content-type',
-                'CONTENT-TYPE', ) as $key) {
+                'CONTENT-TYPE') as $key) {
                 foreach (array(
                     'APPLICATION/JSON',
                     'APPLICATION/JSON; CHARSET=UTF-8',
@@ -1332,7 +1333,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         foreach (array(
             'Content-Type',
             'content-type',
-            'CONTENT-TYPE', ) as $key) {
+            'CONTENT-TYPE') as $key) {
             foreach (array(
                 'APPLICATION/JSON',
                 'APPLICATION/JSON; CHARSET=UTF-8',
@@ -1478,10 +1479,10 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $class = new \ReflectionClass('\Curl\Curl');
         $property = $class->getProperty('jsonPattern');
         $property->setAccessible(true);
-        $json_pattern = $property->getValue(new Curl());
+        $json_pattern = $property->getValue(new Curl);
 
         foreach ($json_content_types as $json_content_type) {
-            $message = '"'.$json_content_type.'" does not match pattern '.$json_pattern;
+            $message = '"' . $json_content_type . '" does not match pattern ' . $json_pattern;
             $this->assertEquals(1, preg_match($json_pattern, $json_content_type), $message);
         }
 
@@ -2557,7 +2558,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         );
 
         foreach ($not_json_content_types as $json_content_type) {
-            $message = '"'.$json_content_type.'" matches pattern '.$json_pattern;
+            $message = '"' . $json_content_type . '" matches pattern ' . $json_pattern;
             $this->assertEquals(0, preg_match($json_pattern, $json_content_type), $message);
         }
     }
@@ -2567,7 +2568,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         foreach (array(
             'Content-Type',
             'content-type',
-            'CONTENT-TYPE', ) as $key) {
+            'CONTENT-TYPE') as $key) {
             foreach (array(
                 'application/atom+xml; charset=UTF-8',
                 'application/atom+xml;charset=UTF-8',
@@ -2889,20 +2890,20 @@ class CurlTest extends \PHPUnit\Framework\TestCase
     {
         // Skip memory leak test failing for PHP 7.
         // "Failed asserting that 8192 is less than 1000."
-        if ('7.0' === getenv('TRAVIS_PHP_VERSION')) {
+        if (getenv('TRAVIS_PHP_VERSION') === '7.0') {
             $this->markTestSkipped();
         }
 
         ob_start();
         echo '[';
-        for ($i = 0; $i < 10; ++$i) {
+        for ($i = 0; $i < 10; $i++) {
             if ($i >= 1) {
                 echo ',';
             }
-            echo '{"before":'.memory_get_usage().',';
+            echo '{"before":' . memory_get_usage() . ',';
             $curl = new Curl();
             $curl->close();
-            echo '"after":'.memory_get_usage().'}';
+            echo '"after":' . memory_get_usage() . '}';
             sleep(1);
         }
         echo ']';
@@ -2950,7 +2951,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $test->server('xml_with_cdata_response', 'POST');
         $this->assertTrue(is_object($test->curl->response));
         $this->assertInstanceOf('SimpleXMLElement', $test->curl->response);
-        $this->assertFalse(false === strpos($test->curl->response->saveXML(), '<![CDATA['));
+        $this->assertFalse(strpos($test->curl->response->saveXML(), '<![CDATA[') === false);
 
         $test = new Test();
         $test->curl->setXmlDecoder(function ($response) {
@@ -2959,7 +2960,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
         $test->server('xml_with_cdata_response', 'POST');
         $this->assertTrue(is_object($test->curl->response));
         $this->assertInstanceOf('SimpleXMLElement', $test->curl->response);
-        $this->assertTrue(false === strpos($test->curl->response->saveXML(), '<![CDATA['));
+        $this->assertTrue(strpos($test->curl->response->saveXML(), '<![CDATA[') === false);
 
         $test = new Test();
         $test->curl->setXmlDecoder(false);
@@ -3118,7 +3119,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             array(
                 'args' => array(
                     'url' => 'https://www.example.com/?a=base',
-                    'mixed_data' => 'b=2&c=3',
+                    'mixed_data' => 'b=2&c=3'
                 ),
                 'expected' => 'https://www.example.com/?a=base&b=2&c=3',
             ),
@@ -3151,7 +3152,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             'arg' => 'value',
             'another' => 'one',
         );
-        $expected_url = $base_url.'?arg=value&another=one';
+        $expected_url = $base_url . '?arg=value&another=one';
 
         foreach (array(false, '&amp;', '&') as $arg_separator) {
             if ($arg_separator) {
@@ -3310,7 +3311,7 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             $test = new Test();
             $test->curl->setOpt(CURLOPT_COOKIEJAR, '/dev/null');
 
-            if (!(null === $maximum_number_of_retries)) {
+            if (!($maximum_number_of_retries === null)) {
                 $test->curl->setRetry($maximum_number_of_retries);
             }
 
@@ -3384,10 +3385,9 @@ class CurlTest extends \PHPUnit\Framework\TestCase
             $test = new Test();
             $test->curl->setOpt(CURLOPT_COOKIEJAR, '/dev/null');
 
-            if (!(null === $maximum_number_of_retries)) {
+            if (!($maximum_number_of_retries === null)) {
                 $test->curl->setRetry(function ($instance) use ($maximum_number_of_retries) {
                     $return = $instance->retries < $maximum_number_of_retries;
-
                     return $return;
                 });
             }

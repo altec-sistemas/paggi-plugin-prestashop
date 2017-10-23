@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 // curl --request SEARCH "http://127.0.0.1:8000/" --data "a=1&b=2&c=3"
 
@@ -14,8 +13,8 @@ $curl->search('http://127.0.0.1:8000/', array(
 ));
 
 if ($curl->error) {
-    echo 'Error: '.$curl->errorCode.': '.$curl->errorMessage."\n";
+    echo 'Error: ' . $curl->errorCode . ': ' . $curl->errorMessage . "\n";
 } else {
-    echo 'Response:'."\n";
+    echo 'Response:' . "\n";
     var_dump($curl->response);
 }

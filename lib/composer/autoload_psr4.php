@@ -6,8 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Paggi\\Traits\\' => array($vendorDir.'/paggi/sdk/lib/Traits'),
-    'Paggi\\' => array($vendorDir.'/paggi/sdk/lib'),
-    'Doctrine\\Common\\Inflector\\' => array($vendorDir.'/doctrine/inflector/lib/Doctrine/Common/Inflector'),
-    'Curl\\' => array($vendorDir.'/php-curl-class/php-curl-class/src/Curl'),
+    'Paggi\\Traits\\' => array($vendorDir . '/paggi/sdk/lib/Traits'),
+    'Paggi\\' => array($vendorDir . '/paggi/sdk/lib'),
+    'Doctrine\\Common\\Inflector\\' => array($vendorDir . '/doctrine/inflector/lib/Doctrine/Common/Inflector'),
+    'Curl\\' => array($vendorDir . '/php-curl-class/php-curl-class/src/Curl'),
 );

@@ -1,2 +1,3 @@
 # ignore all file composer
-composer.*
+composer.lock
+config_pt.xml

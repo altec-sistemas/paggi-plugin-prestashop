@@ -1,30 +1,29 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 const GRATIPAY_USERNAME = 'XXXXXXXXXX';
 const GRATIPAY_API_KEY = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX';
 
 $data = array(
     array(
-        'username' => 'user'.mt_rand(),
+        'username' => 'user' . mt_rand(),
         'platform' => 'gratipay',
-        'amount' => '0.02',
+        'amount' =>  '0.02',
     ),
     array(
-        'username' => 'user'.mt_rand(),
+        'username' => 'user' . mt_rand(),
         'platform' => 'gratipay',
-        'amount' => '0.02',
+        'amount' =>  '0.02',
     ),
 );
 
 $curl = new Curl();
 $curl->setHeader('Content-Type', 'application/json');
 $curl->setBasicAuthentication(GRATIPAY_API_KEY);
-$curl->post('https://gratipay.com/'.GRATIPAY_USERNAME.'/tips.json', $data);
+$curl->post('https://gratipay.com/' . GRATIPAY_USERNAME . '/tips.json', $data);
 
 foreach ($curl->response as $tip) {
-    echo $tip->amount.' given to '.$tip->username.'.'."\n";
+    echo $tip->amount . ' given to ' . $tip->username . '.' . "\n";
 }

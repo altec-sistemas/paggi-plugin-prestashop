@@ -1,10 +1,9 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 $curl = new Curl();
 $curl->setCookie('foo', 'bar');
 $curl->get('https://httpbin.org/cookies');
-var_dump('bar' === $curl->response->cookies->foo);
+var_dump($curl->response->cookies->foo === 'bar');

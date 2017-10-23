@@ -17,7 +17,7 @@ trait Create
      * @throws PaggiException Representation of HTTP error code
      * @return mixed Object representing created entity
      */
-    public static function create($params)
+    static public function create($params)
     {
         $rest = new RestClient();
         $curl = $rest->getCurl();

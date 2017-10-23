@@ -13,7 +13,7 @@ class ContentRangeServer
 
         if (!isset($_SERVER['HTTP_RANGE'])) {
             header('HTTP/1.1 200 OK');
-            header('Content-Length: '.$filesize);
+            header('Content-Length: ' . $filesize);
             header('Accept-Ranges: bytes');
             fpassthru($fp);
         } else {
@@ -21,15 +21,15 @@ class ContentRangeServer
 
             if (!$range->isValid()) {
                 header('HTTP/1.1 416 Requested Range Not Satisfiable');
-                header('Content-Range: '.$range->getContentRangeHeader());
+                header('Content-Range: ' . $range->getContentRangeHeader());
                 exit;
             }
 
             $length = $range->getLength();
 
             header('HTTP/1.1 206 Partial Content');
-            header('Content-Length: '.$length);
-            header('Content-Range: '.$range->getContentRangeHeader());
+            header('Content-Length: ' . $length);
+            header('Content-Range: ' . $range->getContentRangeHeader());
 
             $start = $range->getFirstBytePosition();
             if ($start > 0) {

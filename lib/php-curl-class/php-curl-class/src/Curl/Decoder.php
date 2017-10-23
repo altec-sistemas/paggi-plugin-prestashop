@@ -5,8 +5,9 @@ namespace Curl;
 class Decoder
 {
     /**
-     * Decode JSON.
+     * Decode JSON
      *
+     * @access public
      * @param  $json
      * @param  $assoc
      * @param  $depth
@@ -24,25 +25,24 @@ class Decoder
         }
 
         $response = call_user_func_array('json_decode', $args);
-        if (null === $response) {
+        if ($response === null) {
             $response = $args['0'];
         }
-
         return $response;
     }
 
     /**
-     * Decode XML.
+     * Decode XML
      *
+     * @access public
      * @param  $response
      */
     public static function decodeXml($response)
     {
         $xml_obj = @simplexml_load_string($response);
-        if (!(false === $xml_obj)) {
+        if (!($xml_obj === false)) {
             $response = $xml_obj;
         }
-
         return $response;
     }
 }

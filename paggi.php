@@ -736,7 +736,9 @@ class Paggi extends PaymentModule
 
         if(Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1){
 
-            $cpf = PaggiCustomer::getCPFByCustomerPS($this->context->customer);
+
+            $customer = new Customer($id_customer);
+            $cpf = PaggiCustomer::getCPFByCustomerPS( $customer );
 
         }else{
 

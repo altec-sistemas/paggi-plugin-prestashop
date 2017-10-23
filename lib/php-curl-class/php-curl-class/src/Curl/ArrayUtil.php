@@ -5,23 +5,25 @@ namespace Curl;
 class ArrayUtil
 {
     /**
-     * Is Array Assoc.
+     * Is Array Assoc
      *
+     * @access public
      * @param  $array
      *
-     * @return bool
+     * @return boolean
      */
     public static function is_array_assoc($array)
     {
-        return (bool) count(array_filter(array_keys($array), 'is_string'));
+        return (bool)count(array_filter(array_keys($array), 'is_string'));
     }
 
     /**
-     * Is Array Multidim.
+     * Is Array Multidim
      *
+     * @access public
      * @param  $array
      *
-     * @return bool
+     * @return boolean
      */
     public static function is_array_multidim($array)
     {
@@ -29,12 +31,13 @@ class ArrayUtil
             return false;
         }
 
-        return (bool) count(array_filter($array, 'is_array'));
+        return (bool)count(array_filter($array, 'is_array'));
     }
 
     /**
-     * Array Flatten Multidim.
+     * Array Flatten Multidim
      *
+     * @access public
      * @param  $array
      * @param  $prefix
      *
@@ -50,7 +53,7 @@ class ArrayUtil
                 foreach ($array as $key => $value) {
                     if (is_scalar($value)) {
                         if ($prefix) {
-                            $return[$prefix.'['.$key.']'] = $value;
+                            $return[$prefix . '[' . $key . ']'] = $value;
                         } else {
                             $return[$key] = $value;
                         }
@@ -62,17 +65,16 @@ class ArrayUtil
                                 $return,
                                 self::array_flatten_multidim(
                                     $value,
-                                    $prefix ? $prefix.'['.$key.']' : $key
+                                    $prefix ? $prefix . '[' . $key . ']' : $key
                                 )
                             );
                         }
                     }
                 }
             }
-        } elseif (null === $array) {
+        } elseif ($array === null) {
             $return[$prefix] = $array;
         }
-
         return $return;
     }
 }

@@ -4,7 +4,7 @@ require_once 'ContentRangeServer.php';
 require_once 'RangeHeader.php';
 require_once 'Helper.php';
 
-use Helper\Test;
+use \Helper\Test;
 
 $http_raw_post_data = file_get_contents('php://input');
 $_PUT = array();
@@ -17,20 +17,20 @@ if (!array_key_exists('CONTENT_TYPE', $_SERVER) && array_key_exists('HTTP_CONTEN
 }
 $content_type = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
 $data_values = $_GET;
-if ('POST' === $request_method) {
+if ($request_method === 'POST') {
     $data_values = $_POST;
-} elseif ('PUT' === $request_method) {
-    if (0 === strpos($content_type, 'application/x-www-form-urlencoded')) {
+} elseif ($request_method === 'PUT') {
+    if (strpos($content_type, 'application/x-www-form-urlencoded') === 0) {
         parse_str($http_raw_post_data, $_PUT);
         $data_values = $_PUT;
     }
-} elseif ('PATCH' === $request_method) {
-    if (0 === strpos($content_type, 'application/x-www-form-urlencoded')) {
+} elseif ($request_method === 'PATCH') {
+    if (strpos($content_type, 'application/x-www-form-urlencoded') === 0) {
         parse_str($http_raw_post_data, $_PATCH);
         $data_values = $_PATCH;
     }
-} elseif ('DELETE' === $request_method) {
-    if (0 === strpos($content_type, 'application/x-www-form-urlencoded')) {
+} elseif ($request_method === 'DELETE') {
+    if (strpos($content_type, 'application/x-www-form-urlencoded') === 0) {
         parse_str($http_raw_post_data, $_DELETE);
         $data_values = $_DELETE;
     }
@@ -44,7 +44,7 @@ if (isset($_SERVER['HTTP_X_DEBUG_TEST'])) {
 }
 $key = isset($data_values['key']) ? $data_values['key'] : '';
 
-if ('http_basic_auth' === $test) {
+if ($test === 'http_basic_auth') {
     if (!isset($_SERVER['PHP_AUTH_USER'])) {
         header('WWW-Authenticate: Basic realm="My Realm"');
         header('HTTP/1.1 401 Unauthorized');
@@ -58,7 +58,7 @@ if ('http_basic_auth' === $test) {
         'password' => $_SERVER['PHP_AUTH_PW'],
     ));
     exit;
-} elseif ('http_digest_auth' === $test) {
+} elseif ($test === 'http_digest_auth') {
     $users = array(
         'myusername' => 'mypassword',
     );
@@ -90,7 +90,7 @@ if ('http_basic_auth' === $test) {
         'response' => '',
     );
     preg_match_all(
-        '@('.implode('|', array_keys($data)).')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@',
+        '@(' . implode('|', array_keys($data)) . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@',
         $_SERVER['PHP_AUTH_DIGEST'],
         $matches,
         PREG_SET_ORDER
@@ -99,10 +99,10 @@ if ('http_basic_auth' === $test) {
         $data[$match['1']] = $match['3'] ? $match['3'] : $match['4'];
     }
 
-    $A1 = md5($data['username'].':'.$realm.':'.$users[$data['username']]);
-    $A2 = md5($_SERVER['REQUEST_METHOD'].':'.$data['uri']);
+    $A1 = md5($data['username'] . ':' . $realm . ':' . $users[$data['username']]);
+    $A2 = md5($_SERVER['REQUEST_METHOD'] . ':' . $data['uri']);
     $valid_response = md5(
-        $A1.':'.$data['nonce'].':'.$data['nc'].':'.$data['cnonce'].':'.$data['qop'].':'.$A2
+        $A1 . ':' . $data['nonce'] . ':' . $data['nc'] . ':' . $data['cnonce'] . ':' . $data['qop'] . ':' . $A2
     );
 
     if (!($data['response'] === $valid_response)) {
@@ -113,68 +113,68 @@ if ('http_basic_auth' === $test) {
 
     echo 'valid';
     exit;
-} elseif ('get' === $test) {
+} elseif ($test === 'get') {
     echo http_build_query($_GET);
     exit;
-} elseif ('post' === $test) {
+} elseif ($test === 'post') {
     echo http_build_query($_POST);
     exit;
-} elseif ('post_json' === $test) {
+} elseif ($test === 'post_json') {
     echo $http_raw_post_data;
     exit;
-} elseif ('put' === $test) {
+} elseif ($test === 'put') {
     echo $http_raw_post_data;
     exit;
-} elseif ('patch' === $test) {
+} elseif ($test === 'patch') {
     echo $http_raw_post_data;
     exit;
-} elseif ('post_multidimensional' === $test || 'post_multidimensional_with_file' === $test) {
+} elseif ($test === 'post_multidimensional' || $test === 'post_multidimensional_with_file') {
     header('Content-Type: application/json');
     echo json_encode(array(
         'post' => $_POST,
         'files' => $_FILES,
     ));
     exit;
-} elseif ('post_file_path_upload' === $test) {
+} elseif ($test === 'post_file_path_upload') {
     echo Helper\mime_type($_FILES[$key]['tmp_name']);
     exit;
-} elseif ('put_file_handle' === $test) {
+} elseif ($test === 'put_file_handle') {
     $tmp_filename = tempnam('/tmp', 'php-curl-class.');
     file_put_contents($tmp_filename, $http_raw_post_data);
     echo Helper\mime_type($tmp_filename);
     unlink($tmp_filename);
     exit;
-} elseif ('request_method' === $test) {
-    header('X-REQUEST-METHOD: '.$request_method);
+} elseif ($test === 'request_method') {
+    header('X-REQUEST-METHOD: ' . $request_method);
     echo $request_method;
     exit;
-} elseif ('request_uri' === $test) {
+} elseif ($test === 'request_uri') {
     echo $_SERVER['REQUEST_URI'];
     exit;
-} elseif ('setcookie' === $test) {
+} elseif ($test === 'setcookie') {
     foreach ($_COOKIE as $key => $value) {
         setcookie($key, $value);
     }
     exit;
-} elseif ('cookiejar' === $test) {
+} elseif ($test === 'cookiejar') {
     setcookie('mycookie', 'yum');
     exit;
-} elseif ('multiple_cookie' === $test) {
+} elseif ($test === 'multiple_cookie') {
     setcookie('cookie1', 'scrumptious');
     setcookie('cookie2', 'mouthwatering');
     exit;
-} elseif ('response_header' === $test) {
+} elseif ($test === 'response_header') {
     header('Content-Type: application/json');
-    header('ETag: '.md5('worldpeace'));
+    header('ETag: ' . md5('worldpeace'));
     exit;
-} elseif ('response_body' === $test) {
+} elseif ($test === 'response_body') {
     echo 'OK';
     exit;
-} elseif ('json_response' === $test) {
-    if ('POST' === $request_method) {
+} elseif ($test === 'json_response') {
+    if ($request_method === 'POST') {
         $key = $_POST['key'];
         $value = $_POST['value'];
-        header($key.': '.$value);
+        header($key . ': ' . $value);
     } else {
         header('Content-Type: application/json');
     }
@@ -188,10 +188,10 @@ if ('http_basic_auth' === $test) {
         'string' => 'string',
     ));
     exit;
-} elseif ('xml_response' === $test) {
+} elseif ($test === 'xml_response') {
     $key = $_POST['key'];
     $value = $_POST['value'];
-    header($key.': '.$value);
+    header($key . ': ' . $value);
     $doc = new DOMDocument();
     $doc->formatOutput = true;
     $rss = $doc->appendChild($doc->createElement('rss'));
@@ -209,7 +209,7 @@ if ('http_basic_auth' === $test) {
     $rss->appendChild($channel);
     echo $doc->saveXML();
     exit;
-} elseif ('xml_with_cdata_response' === $test) {
+} elseif ($test === 'xml_with_cdata_response') {
     header('Content-Type: text/xml');
     echo '<?xml version="1.0" encoding="UTF-8"?>
 <rss>
@@ -231,41 +231,41 @@ if ('http_basic_auth' === $test) {
     </items>
 </rss>';
     exit;
-} elseif ('upload_response' === $test) {
+} elseif ($test === 'upload_response') {
     $tmp_filename = tempnam('/tmp', 'php-curl-class.');
     move_uploaded_file($_FILES['image']['tmp_name'], $tmp_filename);
     header('Content-Type: application/json');
-    header('ETag: '.md5_file($tmp_filename));
+    header('ETag: ' . md5_file($tmp_filename));
     echo json_encode(array(
         'file_path' => $tmp_filename,
     ));
     exit;
-} elseif ('upload_cleanup' === $test) {
+} elseif ($test === 'upload_cleanup') {
     $unsafe_file_path = $_POST['file_path'];
     echo var_export(unlink($unsafe_file_path), true);
     exit;
-} elseif ('download_response' === $test) {
+} elseif ($test === 'download_response') {
     $unsafe_file_path = $_GET['file_path'];
     header('Content-Type: image/png');
     header('Content-Disposition: attachment; filename="image.png"');
-    header('Content-Length: '.filesize($unsafe_file_path));
-    header('ETag: '.md5_file($unsafe_file_path));
+    header('Content-Length: ' . filesize($unsafe_file_path));
+    header('ETag: ' . md5_file($unsafe_file_path));
     readfile($unsafe_file_path);
     exit;
-} elseif ('download_file_size' === $test) {
+} elseif ($test === 'download_file_size') {
     $bytes = isset($_GET['bytes']) ? $_GET['bytes'] : 1234;
     $str = str_repeat('.', $bytes);
     header('Content-Type: application/octet-stream');
-    header('Content-Length: '.strlen($str));
-    header('ETag: '.md5($str));
+    header('Content-Length: ' . strlen($str));
+    header('ETag: ' . md5($str));
     echo $str;
     exit;
-} elseif ('download_file_range' === $test) {
+} elseif ($test === 'download_file_range') {
     $unsafe_file_path = $_GET['file_path'];
     $server = new ContentRangeServer\ContentRangeServer();
     $server->serve($unsafe_file_path);
     exit;
-} elseif ('timeout' === $test) {
+} elseif ($test === 'timeout') {
     $unsafe_seconds = $_GET['seconds'];
     $start = time();
     while (true) {
@@ -279,14 +279,14 @@ if ('http_basic_auth' === $test) {
         }
     }
     exit;
-} elseif ('error_message' === $test) {
+} elseif ($test === 'error_message') {
     if (function_exists('http_response_code')) {
         http_response_code(401);
     } else {
         header('HTTP/1.1 401 Unauthorized');
     }
     exit;
-} elseif ('redirect' === $test) {
+} elseif ($test === 'redirect') {
     if (!isset($_GET['redirect'])) {
         header('Location: ?redirect');
         exit;
@@ -294,22 +294,22 @@ if ('http_basic_auth' === $test) {
 
     echo 'OK';
     exit;
-} elseif ('delete_with_body' === $test) {
+} elseif ($test === 'delete_with_body') {
     header('Content-Type: application/json');
     echo json_encode(array(
         'get' => $_GET,
         'delete' => $_DELETE,
     ));
     exit;
-} elseif ('data_values' === $test) {
+} elseif ($test === 'data_values') {
     header('Content-Type: application/json');
     echo json_encode($data_values);
     exit;
-} elseif ('post_redirect_get' === $test) {
+} elseif ($test === 'post_redirect_get') {
     if (isset($_GET['redirect'])) {
         echo "Redirected: $request_method";
     } else {
-        if ('POST' === $request_method) {
+        if ($request_method === 'POST') {
             if (function_exists('http_response_code')) {
                 http_response_code(303);
             } else {
@@ -323,13 +323,13 @@ if ('http_basic_auth' === $test) {
     }
 
     exit;
-} elseif ('retry' === $test) {
+} elseif ($test === 'retry') {
     session_start();
 
     if (isset($_SESSION['failures_remaining'])) {
         $failures_remaining = $_SESSION['failures_remaining'];
     } else {
-        $failures_remaining = (int) $_GET['failures'];
+        $failures_remaining = (int)$_GET['failures'];
         $_SESSION['failures_remaining'] = $failures_remaining;
     }
 
@@ -338,13 +338,13 @@ if ('http_basic_auth' === $test) {
 
         header('HTTP/1.1 503 Service Unavailable');
         echo 'Service Unavailable';
-        echo ' (remaining failures: '.$_SESSION['failures_remaining'].')';
+        echo ' (remaining failures: ' . $_SESSION['failures_remaining'] . ')';
         exit;
     }
 
     header('HTTP/1.1 202 Accepted');
     echo '202 Accepted';
-    echo ' (remaining failures: '.$_SESSION['failures_remaining'].')';
+    echo ' (remaining failures: ' . $_SESSION['failures_remaining'] . ')';
     exit;
 }
 

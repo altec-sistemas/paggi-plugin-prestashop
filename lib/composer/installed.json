@@ -129,24 +129,24 @@
     },
     {
         "name": "paggi/sdk",
-        "version": "v1.2.1",
-        "version_normalized": "1.2.1.0",
+        "version": "v1.2.3",
+        "version_normalized": "1.2.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/paggi-com/php-sdk.git",
-            "reference": "1fa59e7a1d542b35ed26006194ce7655c80d70af"
+            "reference": "ae8cce18ee04ab627be4cfd4f5c6fe1aadfbf144"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/paggi-com/php-sdk/zipball/1fa59e7a1d542b35ed26006194ce7655c80d70af",
-            "reference": "1fa59e7a1d542b35ed26006194ce7655c80d70af",
+            "url": "https://api.github.com/repos/paggi-com/php-sdk/zipball/ae8cce18ee04ab627be4cfd4f5c6fe1aadfbf144",
+            "reference": "ae8cce18ee04ab627be4cfd4f5c6fe1aadfbf144",
             "shasum": ""
         },
         "require": {
             "doctrine/inflector": "^1.2",
             "php-curl-class/php-curl-class": "^7.3"
         },
-        "time": "2017-09-05T19:54:51+00:00",
+        "time": "2017-10-23T18:13:23+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

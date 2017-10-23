@@ -14,3 +14,5 @@ class Card extends Entity
 {
     use FindAll, Create, FindById, Delete;
 }
+
+?>

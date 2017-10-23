@@ -25,7 +25,6 @@ class Test
         } else {
             $this->curl->$request_method(self::TEST_URL, $query_parameters, $data);
         }
-
         return $this->curl->response;
     }
 
@@ -36,7 +35,7 @@ class Test
      */
     private function chainedRequest($request_method)
     {
-        if ('POST' === $request_method) {
+        if ($request_method === 'POST') {
             $this->server('request_method', $request_method, array(), true);
         } else {
             $this->server('request_method', $request_method);
@@ -58,7 +57,6 @@ function create_png()
     imagepng(imagecreatefromstring(base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')));
     $raw_image = ob_get_contents();
     ob_end_clean();
-
     return $raw_image;
 }
 
@@ -67,7 +65,6 @@ function create_tmp_file($data)
     $tmp_file = tmpfile();
     fwrite($tmp_file, $data);
     rewind($tmp_file);
-
     return $tmp_file;
 }
 
@@ -75,9 +72,8 @@ function get_tmp_file_path()
 {
     // Return temporary file path without creating file.
     $tmp_file_path =
-        rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).
-        DIRECTORY_SEPARATOR.'php-curl-class.'.uniqid(rand(), true);
-
+        rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) .
+        DIRECTORY_SEPARATOR . 'php-curl-class.' . uniqid(rand(), true);
     return $tmp_file_path;
 }
 
@@ -85,7 +81,6 @@ function get_png()
 {
     $tmp_filename = tempnam('/tmp', 'php-curl-class.');
     file_put_contents($tmp_filename, create_png());
-
     return $tmp_filename;
 }
 
@@ -95,23 +90,20 @@ if (function_exists('finfo_open')) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime_type = finfo_file($finfo, $file_path);
         finfo_close($finfo);
-
         return $mime_type;
     }
 } else {
     function mime_type($file_path)
     {
         $mime_type = mime_content_type($file_path);
-
         return $mime_type;
     }
 }
 
-function upload_file_to_server($upload_file_path)
-{
+function upload_file_to_server($upload_file_path) {
     $upload_test = new Test();
     $upload_test->server('upload_response', 'POST', array(
-        'image' => '@'.$upload_file_path,
+        'image' => '@' . $upload_file_path,
     ));
     $uploaded_file_path = $upload_test->curl->response->file_path;
 
@@ -124,13 +116,12 @@ function upload_file_to_server($upload_file_path)
     return $uploaded_file_path;
 }
 
-function remove_file_from_server($uploaded_file_path)
-{
+function remove_file_from_server($uploaded_file_path) {
     $download_test = new Test();
 
     // Ensure file successfully removed.
     assert('true' === $download_test->server('upload_cleanup', 'POST', array(
         'file_path' => $uploaded_file_path,
     )));
-    assert(false === file_exists($uploaded_file_path));
+    assert(file_exists($uploaded_file_path) === false);
 }

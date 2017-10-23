@@ -12,3 +12,4 @@ class Bank extends Entity
 {
     use FindAll;
 }
+?>

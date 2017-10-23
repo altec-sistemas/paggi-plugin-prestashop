@@ -1,11 +1,10 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 $curl = new Curl();
-for ($i = 1; $i <= 10; ++$i) {
+for ($i = 1; $i <= 10; $i++) {
     $curl->get('https://httpbin.org/get', array(
         'page' => $i,
     ));

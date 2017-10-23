@@ -4,41 +4,49 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1814475da2000df930a6c95fa80396af
+class ComposerStaticInitb700ef940fe0262f2d4b781888765f22
 {
-    public static $prefixLengthsPsr4 = array(
-        'P' => array(
+    public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
             'Paggi\\Traits\\' => 13,
             'Paggi\\' => 6,
         ),
-        'D' => array(
+        'D' => 
+        array (
             'Doctrine\\Common\\Inflector\\' => 26,
         ),
-        'C' => array(
+        'C' => 
+        array (
             'Curl\\' => 5,
         ),
     );
 
-    public static $prefixDirsPsr4 = array(
-        'Paggi\\Traits\\' => array(
-            0 => __DIR__.'/..'.'/paggi/sdk/lib/Traits',
+    public static $prefixDirsPsr4 = array (
+        'Paggi\\Traits\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paggi/sdk/lib/Traits',
         ),
-        'Paggi\\' => array(
-            0 => __DIR__.'/..'.'/paggi/sdk/lib',
+        'Paggi\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paggi/sdk/lib',
         ),
-        'Doctrine\\Common\\Inflector\\' => array(
-            0 => __DIR__.'/..'.'/doctrine/inflector/lib/Doctrine/Common/Inflector',
+        'Doctrine\\Common\\Inflector\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Common/Inflector',
         ),
-        'Curl\\' => array(
-            0 => __DIR__.'/..'.'/php-curl-class/php-curl-class/src/Curl',
+        'Curl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-curl-class/php-curl-class/src/Curl',
         ),
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1814475da2000df930a6c95fa80396af::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1814475da2000df930a6c95fa80396af::$prefixDirsPsr4;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitb700ef940fe0262f2d4b781888765f22::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitb700ef940fe0262f2d4b781888765f22::$prefixDirsPsr4;
+
         }, null, ClassLoader::class);
     }
 }

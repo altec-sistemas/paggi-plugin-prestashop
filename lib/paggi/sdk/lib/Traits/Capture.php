@@ -12,19 +12,23 @@ use \Paggi\RestClient;
  */
 trait Capture
 {
-    /**
-     * @param $rest - The RestClient object
-     * @param $id - Resouce ID
-     * @return mixed - Exception or a Response
-     */
-    public static function capture($id)
-    {
-        $rest = new RestClient();
-        $curl = $rest->getCurl();
-        $class = new \ReflectionClass(self::class);
+  /**
+   * @param $rest - The RestClient object
+   * @param $id - Resouce ID
+   * @return mixed - Exception or a Response
+   */
+  public function capture()
+  {
+    $rest = new RestClient();
+    $curl = $rest->getCurl();
+    $class = new \ReflectionClass(self::class);
 
-        $curl->put($rest->getEndpoint($class->getShortName()) . '/'. $id. '/capture');
+    $idResource = get_object_vars($this)['id'];
 
-        return self::manageResponse($curl);
-    }
+    $curl->put($rest->getEndpoint($class->getShortName()) . '/'. $idResource. '/capture');
+
+    return self::manageResponse($curl);
+  }
 }
+
+?>

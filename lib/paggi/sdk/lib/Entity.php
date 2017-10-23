@@ -11,15 +11,16 @@ use \Paggi\Traits\Util;
 
 abstract class Entity
 {
-    use Util;
+  use Util;
 
-    /**
-     * @param $params Array Entity properties
-     * */
-    public function __construct(array $params)
+  /**
+   * @param $params Array Entity properties
+   * */
+  public function __construct(array $params)
+  {
+    foreach($params as $property => $value)
     {
-        foreach ($params as $property => $value) {
-            $this->{$property} = $value;
-        }
+      $this->{$property} = $value;
     }
+  }
 }

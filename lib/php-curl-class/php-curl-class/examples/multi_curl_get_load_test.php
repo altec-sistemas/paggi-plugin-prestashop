@@ -1,15 +1,14 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\MultiCurl;
+use \Curl\MultiCurl;
 
 $server_count = 10;
 $urls = array();
 $port = 8000;
-for ($i = 0; $i < $server_count; ++$i) {
+for ($i = 0; $i < $server_count; $i++) {
     $port += 1;
-    $urls[] = 'http://localhost:'.$port.'/';
+    $urls[] = 'http://localhost:' . $port . '/';
 }
 
 $multi_curl = new MultiCurl();
@@ -29,14 +28,14 @@ $multi_curl->complete(function ($instance) use (&$complete) {
 });
 
 $limit = 1000;
-for ($i = 0; $i < $limit; ++$i) {
+for ($i = 0; $i < $limit; $i++) {
     $url = $urls[mt_rand(0, count($urls) - 1)];
     $multi_curl->addGet($url);
 }
 
 $multi_curl->start();
 
-echo 'complete: '.$complete."\n";
-echo 'success: '.$success."\n";
-echo 'error: '.$error."\n";
-echo 'done'."\n";
+echo 'complete: ' . $complete . "\n";
+echo 'success: ' . $success . "\n";
+echo 'error: ' . $error . "\n";
+echo 'done' . "\n";

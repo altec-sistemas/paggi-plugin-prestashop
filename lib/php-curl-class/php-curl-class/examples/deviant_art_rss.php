@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 $curl = new Curl();
 $curl->get('http://backend.deviantart.com/rss.xml', array(
@@ -15,8 +14,8 @@ foreach ($curl->response->channel->item as $entry) {
     foreach ($thumbnails as $thumbnail) {
         $img = $thumbnail->attributes();
         echo
-            '<a href="'.$entry->link.'">'.
-                '<img alt="" src="'.$img->url.'" height="'.$img->height.'" width="'.$img->width.'" />'.
+            '<a href="' . $entry->link . '">' .
+                '<img alt="" src="' . $img->url . '" height="' . $img->height . '" width="' . $img->width . '" />' .
             '</a>';
     }
 }

@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 const INSTAGRAM_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 const INSTAGRAM_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
@@ -10,7 +9,7 @@ const INSTAGRAM_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 session_start();
 
 $redirect_uri = implode('', array(
-    isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http',
+    isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http',
     '://',
     $_SERVER['SERVER_NAME'],
     $_SERVER['SCRIPT_NAME'],
@@ -29,7 +28,7 @@ if (isset($_GET['code'])) {
     ));
 
     if ($curl->error) {
-        echo $curl->response->error_type.': '.$curl->response->errorMessage.'<br />';
+        echo $curl->response->error_type . ': ' . $curl->response->errorMessage . '<br />';
         echo '<a href="?">Try again?</a>';
         exit;
     }
@@ -44,12 +43,12 @@ if (isset($_SESSION['access_token'])) {
     ));
     foreach ($curl->response->data as $media) {
         echo
-            '<a href="'.$media->link.'" target="_blank">'.
-                '<img alt="" src="'.$media->images->thumbnail->url.'" />'.
+            '<a href="' . $media->link . '" target="_blank">' .
+                '<img alt="" src="' . $media->images->thumbnail->url . '" />' .
             '</a>';
     }
 } else {
-    header('Location: https://api.instagram.com/oauth/authorize/?'.http_build_query(array(
+    header('Location: https://api.instagram.com/oauth/authorize/?' . http_build_query(array(
         'client_id' => INSTAGRAM_CLIENT_ID,
         'redirect_uri' => $redirect_uri,
         'response_type' => 'code',

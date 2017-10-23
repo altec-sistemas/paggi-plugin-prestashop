@@ -7,7 +7,7 @@
 // $ php ../php-curl-class/scripts/v4_migration.php
 
 $cwd = getcwd();
-echo 'Checking current directory "'.$cwd.'" for possible changes.'."\n";
+echo 'Checking current directory "' . $cwd . '" for possible changes.' . "\n";
 
 $results = array(
     'errors' => array(),
@@ -39,19 +39,19 @@ $regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GE
 foreach ($regex as $file) {
     $filepath = $file['0'];
     $results['files_found'][] = $filepath;
-    if (__FILE__ === $filepath) {
+    if ($filepath === __FILE__) {
         continue;
     }
     $data = file_get_contents($filepath);
     $short_path = str_replace($cwd, '', $filepath);
-    if (false === $data) {
+    if ($data === false) {
         $results['errors'][] = $filepath;
-        echo $short_path.' [ERROR]'."\n";
+        echo $short_path . ' [ERROR]' . "\n";
     } else {
         foreach ($migrations as $old => $new) {
-            if (!(false === strpos($data, '->'.$old))) {
+            if (!(strpos($data, '->' . $old) === false)) {
                 $results['files_to_change'][] = $filepath;
-                echo $short_path."\n";
+                echo $short_path . "\n";
                 break;
             }
         }
@@ -59,24 +59,24 @@ foreach ($regex as $file) {
 }
 
 foreach ($results as $name => $files) {
-    $results[$name.'_count'] = count($files);
+    $results[$name . '_count'] = count($files);
 }
 $results['errors_count'] = count($results['errors']);
 $results['files_found_count'] = count($results['files_found']);
 $results['files_to_change_count'] = count($results['files_to_change']);
 
 if ($results['errors_count'] > 0) {
-    echo 'ERROR: Unable to read files.'."\n";
+    echo 'ERROR: Unable to read files.' . "\n";
     exit(1);
-} elseif (0 === $results['files_found_count']) {
-    echo 'Current directory "'.$cwd.'"'."\n";
-    echo 'ERROR: No read files found in current directory.'."\n";
+} elseif ($results['files_found_count'] === 0) {
+    echo 'Current directory "' . $cwd . '"' . "\n";
+    echo 'ERROR: No read files found in current directory.' . "\n";
     exit(1);
-} elseif (0 === $results['files_to_change_count']) {
-    echo 'OK: No files to change.'."\n";
+} elseif ($results['files_to_change_count'] === 0) {
+    echo 'OK: No files to change.' . "\n";
     exit(0);
 } elseif ($results['files_to_change_count'] > 0) {
-    echo $results['files_to_change_count'].' of '.$results['files_found_count'].' files to change found.'."\n";
+    echo $results['files_to_change_count'] . ' of ' . $results['files_found_count'] . ' files to change found.' . "\n";
     echo 'Continue? [y/n] ';
     if (!in_array(trim(fgets(STDIN)), array('y', 'Y'))) {
         die();
@@ -84,10 +84,10 @@ if ($results['errors_count'] > 0) {
     foreach ($results['files_to_change'] as $filepath) {
         $data = file_get_contents($filepath);
         foreach ($migrations as $old => $new) {
-            $data = str_replace('->'.$old, '->'.$new, $data);
+            $data = str_replace('->' . $old, '->' . $new, $data);
         }
         file_put_contents($filepath, $data);
     }
-    echo 'Done'."\n";
+    echo 'Done' . "\n";
     exit(0);
 }

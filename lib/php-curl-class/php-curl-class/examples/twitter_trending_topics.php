@@ -1,8 +1,7 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-require __DIR__.'/../vendor/autoload.php';
-
-use Curl\Curl;
+use \Curl\Curl;
 
 const API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXX';
 const API_SECRET = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
@@ -14,7 +13,7 @@ $woeid = '2487956';
 $oauth_data = array(
     'id' => $woeid,
     'oauth_consumer_key' => API_KEY,
-    'oauth_nonce' => md5(microtime().mt_rand()),
+    'oauth_nonce' => md5(microtime() .  mt_rand()),
     'oauth_signature_method' => 'HMAC-SHA1',
     'oauth_timestamp' => time(),
     'oauth_token' => OAUTH_ACCESS_TOKEN,
@@ -35,9 +34,9 @@ $oauth_data['oauth_signature'] = base64_encode(hash_hmac('sha1', $request, $key,
 
 $authorization = array();
 foreach ($oauth_data as $key => $value) {
-    $authorization[] = $key.'="'.rawurlencode($value).'"';
+    $authorization[] = $key . '="' . rawurlencode($value) . '"';
 }
-$authorization = 'Authorization: OAuth '.implode(', ', $authorization);
+$authorization = 'Authorization: OAuth ' . implode(', ', $authorization);
 
 $curl = new Curl();
 $curl->setOpt(CURLOPT_HTTPHEADER, array($authorization));
@@ -45,7 +44,7 @@ $curl->get($url, array(
     'id' => $woeid,
 ));
 
-echo 'Current trends:'."\n";
+echo 'Current trends:' . "\n";
 foreach ($curl->response['0']->trends as $trend) {
-    echo '- '.$trend->name."\n";
+    echo '- ' . $trend->name . "\n";
 }

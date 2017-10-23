@@ -12,3 +12,5 @@ class BankAccount extends Entity
 {
     use FindAll, FindById, Update;
 }
+
+?>
