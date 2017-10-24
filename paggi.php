@@ -279,6 +279,7 @@ class Paggi extends PaymentModule
                 $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
             } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state 
                 && ($charge->status == 'manual_clearing' || $charge->status == 'approved') ) {
+                
                 $charge_cancel = $charge->cancel();
                 $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
             }

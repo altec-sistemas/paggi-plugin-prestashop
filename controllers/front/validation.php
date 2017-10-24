@@ -108,14 +108,15 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
         try {
             $charge = \Paggi\Charge::create($params);
 
-
-            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_PREPARATION'), $total, $this->module->displayName, null, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key);
+            $this->module->validateOrder((int)$cart->id, Configuration::get('PAGGI_STATUS_APPROVED'), $total, $this->module->displayName, null, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key);
         } catch (\Paggi\PaggiException $ex) {
             $message = Tools::jsonDecode($ex->getMessage());
 
             foreach ($message->errors as $error) {
                 $this->errors[] = $error->message;
             }
+
+
 
             $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_ERROR'), $total, $this->module->displayName, null, array(), (int)$currency->id, false, $customer->secure_key);
         }
