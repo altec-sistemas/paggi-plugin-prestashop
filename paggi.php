@@ -972,6 +972,17 @@ class Paggi extends PaymentModule
     */
     public function getFieldsFormInstallments()
     {
+        $options = array();
+
+        for($i = 1; $i <= 12; $i ++){
+          array_push($options,   array(
+            'id' => $i,                 // The value of the 'value' attribute of the <option> tag.
+            'name' => $i.' '. $this->l('installment')             // The value of the text content of the  <option> tag.
+          ));
+        }
+
+       
+
         $fields_form_status = array(
            'form' => array(
                 'legend' => array(
@@ -979,19 +990,32 @@ class Paggi extends PaymentModule
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
-                   
+
+                           
                    array(
-                      'type' => 'text',
+                      'type' => 'select', 
                       'label' => $this->l('Free Installment:'),
                       'desc' => $this->l('Number of interest-free installments'),
-                      'name' => 'PAGGI_FREE_INSTALLMENTS'
+                      'name' => 'PAGGI_FREE_INSTALLMENTS',
+                       'options' => array(
+                        'query' => $options,                           // $options contains the data itself.
+                        'id' => 'id',                           // The value of the 'id' key must be the same as the key for 'value' attribute of the <option> tag in each $options sub-array.
+                        'name' => 'name'                               // The value of the 'name' key must be the same as the key for the text content of the <option> tag in each $options sub-array.
+                      )
                     ),
 
                    array(
-                      'type' => 'text',
+                      'type' => 'select',
                       'label' => $this->l('Max Installments:'),
                       'desc' => $this->l('Maximum value of plots'),
                        'name' => 'PAGGI_MAX_INSTALLMENTS',
+                       
+                         'options' => array(
+                        'query' => $options,                           // $options contains the data itself.
+                        'id' => 'id',                           // The value of the 'id' key must be the same as the key for 'value' attribute of the <option> tag in each $options sub-array.
+                        'name' => 'name'                               // The value of the 'name' key must be the same as the key for the text content of the <option> tag in each $options sub-array.
+                      )
+                     
                      
                     ),
                    array(
@@ -999,7 +1023,6 @@ class Paggi extends PaymentModule
                       'label' => $this->l('Interest Rate:'),
                       'desc' => $this->l('Interest rate value'),
                       'name' => 'PAGGI_INTEREST_RATE'
-                     
                     )
                    
                    ),
