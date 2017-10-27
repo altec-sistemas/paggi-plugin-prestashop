@@ -593,9 +593,9 @@ class Paggi extends PaymentModule
      */
     public function getPaggiImage()
     {
-        $image = empty(Configuration::get('PAGGI_IMG')) ? 'logo.png' : Configuration::get('PAGGI_IMG');
+        $image = empty(Configuration::get('PAGGI_IMG')) ? 'visa-mastercard.jpg' : Configuration::get('PAGGI_IMG');
         if (!file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.$image)) {
-            $image = 'logo.png';
+            $image = 'visa-mastercard.jpg';
         }
 
         return $image;

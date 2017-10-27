@@ -6,7 +6,7 @@
 	<description><![CDATA[M&oacute;dulo de Pagamento Paggi]]></description>
 	<author><![CDATA[Paggi]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>
-	<confirmUninstall><![CDATA[Tem certeza de remover esses detalhes?]]></confirmUninstall>
+	<confirmUninstall><![CDATA[Você tem certeza que deseja remover esses detalhes?]]></confirmUninstall>
 	<is_configurable>1</is_configurable>
 	<need_instance>1</need_instance>
 	<limited_countries></limited_countries>
