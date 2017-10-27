@@ -27,7 +27,7 @@
 
 
 {capture name=path}
-	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='paggi'}">{l s='Checkout' mod='paggi'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Paggi payment' mod='paggi'}
+	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='paggi'}">{l s='Checkout' mod='paggi'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Payment by credit card' mod='paggi'}
 {/capture}
 
 <h2>{l s='Order summary' mod='paggi'}</h2>
@@ -48,7 +48,7 @@
 		<div class="row">
 
 			<div class="col-xs-12 col-sm-12">
-				<h3 class="page-subheading">{l s='Paggi payment' mod='paggi'} - {l s='Choose the card to use' mod='paggi'}</h3>
+				<h3 class="page-subheading">{l s='Payment by credit card' mod='paggi'} - {l s='Choose the card to use' mod='paggi'}</h3>
 
 				<div class="form_content clearfix">	
 					<div class="row">

@@ -113,11 +113,11 @@ class Paggi extends PaymentModule
 
         //warning access envirement staging
         if (!$this->env) {
-            $this->adminDisplayWarning($this->l('You are in a staging environment this module.'));
+            $this->adminDisplayWarning($this->l('You are in the Paggi development environment.'));
         }
 
         if (empty($this->key)) {
-            $this->warning = $this->l('Api Key must be configured to use this module.');
+            $this->warning = $this->l('You need to set up an Api Key to use this module.');
         } else {
             //set init Api Key
             \Paggi\Paggi::setApiKey($this->key);
@@ -286,7 +286,7 @@ class Paggi extends PaymentModule
 
         }catch(\Paggi\PaggiException $ex){
 
-            $this->adminDisplayWarning($this->l('Paggi server error.'));
+            $this->adminDisplayWarning($this->l('Internal error.'));
 
             PrestaShopLogger::addLog($ex->getMessage());
 
@@ -386,7 +386,7 @@ class Paggi extends PaymentModule
                 $file_name = 'cartao.'.$ext;
 
                 if (!move_uploaded_file($_FILES['PAGGI_IMG']['tmp_name'], dirname(__FILE__).DIRECTORY_SEPARATOR.$file_name)) {
-                    return $this->displayError($this->l('An error occurred while attempting to upload the file.'));
+                    return $this->displayError($this->l('An error occurred while sending the file.'));
                 } else {
                     if (Configuration::hasContext('PAGGI_IMG', null, Shop::getContext())
                         && Configuration::get('PAGGI_IMG') != $file_name
@@ -452,7 +452,7 @@ class Paggi extends PaymentModule
     
             $this->uploadImg();
         }
-        $this->html .= $this->displayConfirmation($this->l('Settings updated'));
+        $this->html .= $this->displayConfirmation($this->l('Updated settings.'));
     }
 
 
@@ -497,15 +497,15 @@ class Paggi extends PaymentModule
         $cpf = preg_replace("/[^0-9]/", "", $item);
 
         if (strlen($cpf) <> 11) {
-            throw new Exception($this->l('The CPF must contain 11 digits!'));
+            throw new Exception($this->l('The CPF must contain 11 digits.'));
         }
         if (!is_numeric($cpf)) {
-            throw new Exception($this->l('Only numbers are accepted!'));
+            throw new Exception($this->l('Only numbers are accepted.'));
         }
 
         /* Retorna falso se o cpf for nulo*/
         if (in_array($cpf, $nulos)) {
-            throw new Exception($this->l('Invalid CPF!'));
+            throw new Exception($this->l('Invalid CPF.'));
         }
 
         // if($this->checkDuplicate($cpf) !== false) {
@@ -521,7 +521,7 @@ class Paggi extends PaymentModule
         $acum = ($x > 1) ? (11 - $x) : 0;
         /* Retorna falso se o digito calculado eh diferente do passado na string */
         if ($acum != $cpf[9]) {
-            throw new Exception($this->l('Invalid CPF. Please check!'));
+            throw new Exception($this->l('Invalid CPF. Please verify it and try again.'));
         }
         /*Calcula o último dígito verificador*/
         $acum = 0;
@@ -533,7 +533,7 @@ class Paggi extends PaymentModule
         $acum = ($x > 1) ? (11 - $x) : 0;
         /* Retorna falso se o digito calculado eh diferente do passado na string */
         if ($acum != $cpf[10]) {
-            throw new Exception($this->l('Invalid CPF. Please check!'));
+            throw new Exception($this->l('Invalid CPF. Please verify it and try again.'));
         }
     }
 
@@ -650,12 +650,12 @@ class Paggi extends PaymentModule
                 'input' => array(
                     array(
                         'type' => 'file',
-                        'label' => $this->l('Paggi image'),
+                        'label' => $this->l('Image'),
                         'name' => 'PAGGI_IMG',
                         'image' => $image_url ? $image_url : false,
                         'display_image' => true,
                         'col' => 6,
-                        'desc' => $this->l('Upload a paggi image from your computer.'),
+                        'desc' => $this->l('Picture of checkout Paggi.'),
                     ),
                     array(
                         'type' => 'text',
@@ -666,15 +666,15 @@ class Paggi extends PaymentModule
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Api Key (Staging)'),
+                        'label' => $this->l('Api Key (Development)'),
                         'name' => 'PAGGI_API_KEY_STAGING',
-                        'desc' => $this->l('You can test out our API using this key: B31DCE74-E768-43ED-86DA-85501612548F, even before you create an account with us! All charges made with this key will be in demonstration mode an will not charge any card!'),
+                        'desc' => $this->l('You can test our API using the following token: B31DCE74-E768-43ED-86DA-85501612548F. All transactions made with this key will be in demo mode and no value will be charged to any card.'),
                         'size' => 36,
                         'required' => false,
                     ),
                     array(
                       'type' => 'radio',
-                      'label' => $this->l('Enable this option Enverioment'),
+                      'label' => $this->l('Select the environment.'),
                       'name' => 'PAGGI_ENVIRONMENT',
                       'required' => true,
                       'class' => 't',
@@ -689,7 +689,7 @@ class Paggi extends PaymentModule
                             array(
                               'id' => 'active_off',
                               'value' => 0,
-                              'label' => $this->l('Staging'),
+                              'label' => $this->l('Development'),
                             ),
                       ),
                     ),
@@ -769,7 +769,7 @@ class Paggi extends PaymentModule
                 }catch(Exception $ex){
                    PrestaShopLogger::addLog($ex->getMessage());
 
-                   $this->adminDisplayWarning($this->l('There was an error fetching data in the mapeamenti configuration.'));
+                   $this->adminDisplayWarning($this->l('An error occurred during the data mapping in the configuration.'));
                 }           
 
                
@@ -838,8 +838,8 @@ class Paggi extends PaymentModule
                   
                    array(
                       'type' => 'select',
-                      'label' => $this->l('Approved:'),
-                      'desc' => $this->l('Charge captured for acquirer'),
+                      'label' => $this->l('Approved'),
+                      'desc' => $this->l('Transaction successfully sent to the acquirer.'),
                       'name' => 'PAGGI_STATUS_APPROVED',
                       'options' => array(
                         'query' => $options_status,
@@ -850,8 +850,8 @@ class Paggi extends PaymentModule
 
                    array(
                       'type' => 'select',
-                      'label' => $this->l('Declined:'),
-                      'desc' => $this->l('Charge declined for acquirer'),
+                      'label' => $this->l('Declined'),
+                      'desc' => $this->l('Transaction declined by buyer'),
                        'name' => 'PAGGI_STATUS_DECLINED',
                        'options' => array(
                         'query' => $options_status,
@@ -862,7 +862,7 @@ class Paggi extends PaymentModule
                    array(
                       'type' => 'select',
                       'label' => $this->l('Registered:'),
-                      'desc' => $this->l('Charge registered but not captured'),
+                      'desc' => $this->l('Transaction saved to system but not sent to buyer or risk analysis'),
                       'name' => 'PAGGI_STATUS_REGISTERED',
                       'options' => array(
                         'query' => $options_status,
@@ -872,8 +872,8 @@ class Paggi extends PaymentModule
                     ),
                     array(
                       'type' => 'select',
-                      'label' => $this->l('Pre Approved:'),
-                      'desc' => $this->l('Pre-authorization created in acquirer'),
+                      'label' => $this->l('Pre Approved'),
+                      'desc' => $this->l('Transaction authorized by buyer but not confirmed'),
                       'name' => 'PAGGI_STATUS_PRE_APPROVED',
                       'options' => array(
                         'query' => $options_status,
@@ -884,8 +884,8 @@ class Paggi extends PaymentModule
 
                     array(
                       'type' => 'select',
-                      'label' => $this->l('Cleared:'),
-                      'desc' => $this->l('Charge passing from the risk analysis'),
+                      'label' => $this->l('Approved credit'),
+                      'desc' => $this->l('Transaction authorized by the risk analysis but not sent to the acquirer'),
                       'name' => 'PAGGI_STATUS_CLEARED',
                       'options' => array(
                         'query' => $options_status,
@@ -896,8 +896,8 @@ class Paggi extends PaymentModule
 
                     array(
                       'type' => 'select',
-                      'label' => $this->l('Not Cleared:'),
-                      'desc' => $this->l('Charge declined from risk analysis'),
+                      'label' => $this->l('At risk'),
+                      'desc' => $this->l('Transaction declined by risk analysis'),
                       'name' => 'PAGGI_STATUS_NOT_CLEARED',
                       'options' => array(
                         'query' => $options_status,
@@ -908,8 +908,8 @@ class Paggi extends PaymentModule
 
                      array(
                       'type' => 'select',
-                      'label' => $this->l('Manual Cleared:'),
-                      'desc' => $this->l('Charge should be manually reviewed'),
+                      'label' => $this->l('Manual Cleared'),
+                      'desc' => $this->l('Pre-approved transaction for review.'),
                       'name' => 'PAGGI_STATUS_MANUAL_CLEARING',
                       'options' => array(
                         'query' => $options_status,
@@ -921,8 +921,8 @@ class Paggi extends PaymentModule
 
                      array(
                       'type' => 'select',
-                      'label' => $this->l('Captured:'),
-                      'desc' => $this->l('Pre-authorization captured in acquirer'),
+                      'label' => $this->l('Captured'),
+                      'desc' => $this->l('Pre-authorized transaction was confirmed with the acquirer'),
                       'name' => 'PAGGI_STATUS_CAPTURED',
                       'options' => array(
                         'query' => $options_status,
@@ -933,8 +933,8 @@ class Paggi extends PaymentModule
 
                     array(
                       'type' => 'select',
-                      'label' => $this->l('Cancelled:'),
-                      'desc' => $this->l('Charge cancelled'),
+                      'label' => $this->l('Cancelled'),
+                      'desc' => $this->l('Request for cancellation was sent to the buyer (confirmation within 7 days)'),
                       'name' => 'PAGGI_STATUS_CANCELLED',
                       'options' => array(
                         'query' => $options_status,
@@ -945,8 +945,8 @@ class Paggi extends PaymentModule
 
                     array(
                       'type' => 'select',
-                      'label' => $this->l('Chargeback:'),
-                      'desc' => $this->l('Chargeback from customer or bank'),
+                      'label' => $this->l('Chargeback'),
+                      'desc' => $this->l('Transaction not recognized by cardholder.'),
                       'name' => 'PAGGI_STATUS_CHARGEBACK',
                       'options' => array(
                         'query' => $options_status,
@@ -977,7 +977,7 @@ class Paggi extends PaymentModule
         for($i = 1; $i <= 12; $i ++){
           array_push($options,   array(
             'id' => $i,                 // The value of the 'value' attribute of the <option> tag.
-            'name' => $i.' '. $this->l('installment')             // The value of the text content of the  <option> tag.
+            'name' => $i.' '. $this->l('plots')             // The value of the text content of the  <option> tag.
           ));
         }
 
@@ -994,8 +994,8 @@ class Paggi extends PaymentModule
                            
                    array(
                       'type' => 'select', 
-                      'label' => $this->l('Free Installment:'),
-                      'desc' => $this->l('Number of interest-free installments'),
+                      'label' => $this->l('Interest free parcelling'),
+                      'desc' => $this->l('Number of installments without interest'),
                       'name' => 'PAGGI_FREE_INSTALLMENTS',
                        'options' => array(
                         'query' => $options,                           // $options contains the data itself.
@@ -1006,8 +1006,8 @@ class Paggi extends PaymentModule
 
                    array(
                       'type' => 'select',
-                      'label' => $this->l('Max Installments:'),
-                      'desc' => $this->l('Maximum value of plots'),
+                      'label' => $this->l('Maximum number of plots'),
+                      'desc' => $this->l('Maximum number of parcels possible with payment by credit card.'),
                        'name' => 'PAGGI_MAX_INSTALLMENTS',
                        
                          'options' => array(
@@ -1020,8 +1020,8 @@ class Paggi extends PaymentModule
                     ),
                    array(
                       'type' => 'text',
-                      'label' => $this->l('Interest Rate:'),
-                      'desc' => $this->l('Interest rate value'),
+                      'label' => $this->l('Interest Rate'),
+                      'desc' => $this->l('Interest rate value.'),
                       'name' => 'PAGGI_INTEREST_RATE'
                     )
                    
@@ -1046,7 +1046,7 @@ class Paggi extends PaymentModule
         $fields_form_status = array(
            'form' => array(
                 'legend' => array(
-                    'title' => $this->l('CPF Field Mapping'),
+                    'title' => $this->l('Map CPF field'),
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
@@ -1054,7 +1054,7 @@ class Paggi extends PaymentModule
 
                     array(
                       'type' => 'switch',
-                      'label' => $this->l('Paggi module native CPF customization:'),
+                      'label' => $this->l('Use CPF configuration of Paggi native module.'),
                       'name' => 'PAGGI_CPF_FIELD_ACTIVED_MAPPED',
                       'is_bool' => true,
                       'values' => array(
@@ -1073,19 +1073,19 @@ class Paggi extends PaymentModule
 
                    array(
                       'type' => 'text',
-                      'label' => $this->l('Table to be mapped:'),
+                      'label' => $this->l('Name of the table to be mapped'),
                       'name' => 'PAGGI_CPF_FIELD_TABLE_MAPPED'
                     ),
 
                     array(
                       'type' => 'text',
-                      'label' => $this->l('Column to be mapped:'),
+                      'label' => $this->l('Column to be mapped'),
                       'name' => 'PAGGI_CPF_FIELD_COLUMN_MAPPED'
                     ),
 
                      array(
                       'type' => 'text',
-                      'label' => $this->l('Customer\'s foreign key:'),
+                      'label' => $this->l('Foreign key customer'),
                       'name' => 'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED',
                       'desc' => $this->l('Foreign key with prestashop id_customer. Ex.: `id_mymodule_customer`')
                     ),

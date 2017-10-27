@@ -28,8 +28,8 @@
 	<div class="col-xs-12">
 		<p class="payment_module">
 			<a class="paggi" href="{$link->getModuleLink('paggi', 'payment')|escape:'html':'UTF-8'}" title="{l s='Pay by Paggi' mod='paggi'}">
-			<img src="{$this_path_bw}{$this_img}" alt="{l s='Pay by Paggi' mod='paggi'}" width="86"/>
-				{l s='Pay by Paggi' mod='paggi'} <span>{l s='(order processing will be longer)' mod='paggi'}</span>
+			<img src="{$this_path_bw}{$this_img}" alt="{l s='Payment by credit card' mod='paggi'}" width="86"/>
+				{l s='Payment by credit card' mod='paggi'} <span>{l s='(order processing will be longer)' mod='paggi'}</span>
 			</a>
 		</p>
 	</div>
