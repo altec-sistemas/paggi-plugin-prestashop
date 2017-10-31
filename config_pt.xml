@@ -2,7 +2,7 @@
 <module>
 	<name>paggi</name>
 	<displayName><![CDATA[Paggi]]></displayName>
-	<version><![CDATA[1.0.0]]></version>
+	<version><![CDATA[1.0.1]]></version>
 	<description><![CDATA[M&oacute;dulo de Pagamento Paggi]]></description>
 	<author><![CDATA[Paggi]]></author>
 	<tab><![CDATA[payments_gateways]]></tab>

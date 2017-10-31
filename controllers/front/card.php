@@ -84,8 +84,7 @@ class PaggiCardModuleFrontController extends ModuleFrontController
 
         $card_number = Tools::getValue('PAGGI_CARD_NUMBER');
         $card_alias = Tools::getValue('PAGGI_CARD_ALIAS');
-        $card_expiration = explode("/", Tools::getValue('PAGGI_CARD_EXPIRATE'));
-        $card_document = Tools::getValue('PAGGI_CARD_DOCUMENT');
+        $card_expiration = explode("/", Tools::getValue('PAGGI_CARD_EXPIRATE'));      
         $card_cvc = Tools::getValue('PAGGI_CARD_CVC');
         $card_installment = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
 

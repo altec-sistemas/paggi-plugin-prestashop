@@ -100,7 +100,7 @@
 				
 
 					<div class="row">
-						<div class="col-xs-12 col-sm-12">
+						<div class="col-xs-12 col-sm-8">
 							<div class="form-group">
 								<label for="cardholder_name">{l s='Cardholder Name'}</label>
 								<div class="input-group">
@@ -111,20 +111,8 @@
 								class="is_required validate form-control" name="PAGGI_CARD_HOLDER_NAME" />
 								</div>
 							</div>
-						</div>						
-
-					</div>
-
-					<div class="row">
-						<div class="col-xs-12 col-sm-8">
-							<div class="form-group">
-								<label for="document">{l s='Document'}</label>
-								
-								<input type="text" id="document"
-								class="is_required validate form-control" name="PAGGI_CARD_DOCUMENT" />
-								
-							</div>
 						</div>	
+
 
 						<div class="col-xs-12 col-sm-4">
 							<div class="form-group">
@@ -135,9 +123,11 @@
 									class="is_required validate form-control" name="PAGGI_CARD_CVC" />
 								
 							</div>
-						</div>					
+						</div>						
 
 					</div>
+
+				
 					
 					
 
