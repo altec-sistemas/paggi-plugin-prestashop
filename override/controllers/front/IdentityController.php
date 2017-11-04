@@ -9,26 +9,26 @@ class IdentityController extends IdentityControllerCore
    public function postProcess()
     {   
        
-        if (Tools::isSubmit('submitIdentity')) {
+        // if (Tools::isSubmit('submitIdentity')) {
             
-            $cpf = Tools::getValue('cpf');
+        //     $cpf = Tools::getValue('cpf');
             
-            $numberDoc = preg_replace("/[^0-9]/", "", $cpf);
+        //     $numberDoc = preg_replace("/[^0-9]/", "", $cpf);
             
-            $objModuloCpf = Module::getInstanceByName('paggi');
+        //     $objModuloCpf = Module::getInstanceByName('paggi');
             
-            try {
+        //     try {
                
-                $objModuloCpf->cpfValidation($numberDoc);   
-                PaggiCustomer::setCPFCustomerPS($this->customer, $numberDoc);
+        //         $objModuloCpf->cpfValidation($numberDoc);   
+        //         PaggiCustomer::setCPFCustomerPS($this->customer, $numberDoc);
                 
-            } catch (Exception $exc) {
-                $this->errors[] = Tools::displayError($exc->getMessage());
-            }
+        //     } catch (Exception $exc) {
+        //         $this->errors[] = Tools::displayError($exc->getMessage());
+        //     }
             
-        }
+        // }
 
-        parent::postProcess();
+        // parent::postProcess();
         
     }
 }

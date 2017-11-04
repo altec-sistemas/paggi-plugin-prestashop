@@ -455,24 +455,48 @@ class Paggi extends PaymentModule
         $this->html .= $this->displayConfirmation($this->l('Updated settings.'));
     }
 
+    public function isPS17(){
 
+        return (version_compare(_PS_VERSION_, '1.7.0.0') >= 0);
+    }
 
     public function activeMappedNative(){
 
         $this->desactiveMappedNative();
 
-        $this->addOverride("IdentityController");
+        $this->registerHook('displayHeader');          
 
-        $this->addOverride("AuthController");
 
-        $this->registerHook('displayCustomerIdentityForm');
+        if($this->isPS17()){
 
-        $this->registerHook('createAccountForm');
+            if(!file_exists(_PS_OVERRIDE_DIR_.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'form'))
+            {
+              @mkdir(_PS_OVERRIDE_DIR_.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'form', 755);   
+            }
 
-        $this->registerHook('actionCustomerAccountAdd');
+            $this->addOverride("CustomerForm");  
+
+            $this->registerHook('additionalCustomerFormFields');
+
+        }else{
+
+
+            $this->registerHook('actionCustomerAccountAdd');
+
+            $this->registerHook('displayCustomerIdentityForm');
+
+            $this->registerHook('createAccountForm');
+
+            $this->addOverride("IdentityController");
+
+            $this->addOverride("AuthController");   
+
+        }
     }
 
     public function desactiveMappedNative(){
+
+        $this->unregisterHook('displayHeader');
 
         $this->removeOverride("IdentityController");
 
@@ -482,7 +506,13 @@ class Paggi extends PaymentModule
 
         $this->unregisterHook('createAccountForm');
 
+        $this->unregisterHook('additionalCustomerFormFields');
+
         $this->unregisterHook('actionCustomerAccountAdd');
+
+        $this->removeOverride("CustomerForm"); 
+
+       
 
     }
 
@@ -508,9 +538,7 @@ class Paggi extends PaymentModule
             throw new Exception($this->l('Invalid CPF.'));
         }
 
-        // if($this->checkDuplicate($cpf) !== false) {
-        //     throw new Exception('Este CPF já está cadastrado!');
-        // }
+       
         /*Calcula o penúltimo dígito verificador*/
         $acum = 0;
         for ($i = 0; $i < 9; $i++) {
@@ -538,11 +566,50 @@ class Paggi extends PaymentModule
     }
 
 
+    public function hookDisplayHeader(){
+
+        $controller_name = Tools::getValue('controller');
+
+
+
+        if(in_array($controller_name, array('identity', 'authentication'))){
+            $context = Context::getContext();
+            $context->controller->addJs($this->_path . 'views/js/jquery.mask.min.js');
+            $context->controller->addJs($this->_path . 'views/js/cpf_hook.js');
+        }   
+
+    }
+
+
     public function hookcreateAccountForm(){
 
         return $this->hookDisplayCustomerIdentityForm();
 
     }
+
+    /**
+    * Hook for adding Customer Fields
+    *
+    * @param $params
+    *
+    * @return bool
+    */
+    public function hookAdditionalCustomerFormFields(){
+
+         return array(
+
+                (new FormField)
+                    ->setName('cpf')
+                    ->setType('text')
+                    ->setLabel(
+                        $this->l('CPF')
+                    )
+                    ->addAvailableValue('placeholder', '000.000.000-00')
+                    ->setRequired(true)
+                
+            );
+    }
+
 
     /**
     * Hook executed after client's inclusion
