@@ -28,8 +28,6 @@
  * @link      https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA
  */
-
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -44,29 +42,24 @@ if (!defined('_PS_VERSION_')) {
  *           Academic Free License (AFL 3.0)
  * @link     https://github.com/paggi-com/plugin-prestashop.git
  */
+class Paggi extends PaymentModule {
 
-class Paggi extends PaymentModule
-{
     protected $html = '';
-
     protected $postErrors = array();
-
     protected $env = 0;
-
     public $key = '';
 
     /**
      * This method constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
 
         //load Class
-        require_once __DIR__.'/classes/PaggiCustomer.php';
+        require_once __DIR__ . '/classes/PaggiCustomer.php';
 
         $this->name = 'paggi';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.1';
+        $this->version = '1.2.0';
         $this->author = 'Paggi';
 
         $this->controllers = array('payment', 'validation', 'card');
@@ -80,10 +73,10 @@ class Paggi extends PaymentModule
 
         //load variables
         $config = Configuration::getMultiple(
-            array(
-                'PAGGI_API_KEY_PRODUCTION',
-                'PAGGI_API_KEY_STAGING',
-                'PAGGI_ENVIRONMENT')
+                        array(
+                            'PAGGI_API_KEY_PRODUCTION',
+                            'PAGGI_API_KEY_STAGING',
+                            'PAGGI_ENVIRONMENT')
         );
         if (!empty($config['PAGGI_ENVIRONMENT'])) {
             $this->env = $config['PAGGI_ENVIRONMENT'];
@@ -130,13 +123,8 @@ class Paggi extends PaymentModule
      * @see    PaymentModule::install()
      * @return bool
      */
-    public function install()
-    {
-        if (!parent::install()
-            || !$this->registerHook('payment')
-            || !$this->registerHook('paymentReturn')
-            || !$this->registerHook('actionOrderHistoryAddAfter')
-            || !PaggiCustomer::createTable()
+    public function install() {
+        if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') || !$this->registerHook('actionOrderHistoryAddAfter') || !PaggiCustomer::createTable()
         ) {
             return false;
         }
@@ -150,29 +138,8 @@ class Paggi extends PaymentModule
      * @see    PaymentModule::uninstall()
      * @return bool
      */
-    public function uninstall()
-    {
-        if (!parent::uninstall()
-            || !PaggiCustomer::dropTable()
-            || !Configuration::deleteByName('PAGGI_DOCUMENT_FIELD')
-            || !Configuration::deleteByName('PAGGI_FREE_INSTALLMENTS')
-            || !Configuration::deleteByName('PAGGI_MAX_INSTALLMENTS')
-            || !Configuration::deleteByName('PAGGI_INTEREST_RATE')
-            || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION')
-            || !Configuration::deleteByName('PAGGI_API_KEY_STAGING')
-            || !Configuration::deleteByName('PAGGI_ENVIRONMENT')
-            || !Configuration::deleteByName('PAGGI_IMG')
-            || !Configuration::deleteByName('PAGGI_STATUS_APPROVED')
-            || !Configuration::deleteByName('PAGGI_STATUS_DECLINED')
-            || !Configuration::deleteByName('PAGGI_STATUS_REGISTERED')
-            || !Configuration::deleteByName('PAGGI_STATUS_PRE_APPROVED')
-            || !Configuration::deleteByName('PAGGI_STATUS_CLEARED')
-            || !Configuration::deleteByName('PAGGI_STATUS_NOT_CLEARED')
-            || !Configuration::deleteByName('PAGGI_STATUS_MANUAL_CLEARING')
-            || !Configuration::deleteByName('PAGGI_STATUS_CAPTURED')
-            || !Configuration::deleteByName('PAGGI_STATUS_CANCELLED')
-            || !Configuration::deleteByName('PAGGI_STATUS_CHARGEBACK')
-       
+    public function uninstall() {
+        if (!parent::uninstall() || !PaggiCustomer::dropTable() || !Configuration::deleteByName('PAGGI_DOCUMENT_FIELD') || !Configuration::deleteByName('PAGGI_FREE_INSTALLMENTS') || !Configuration::deleteByName('PAGGI_MAX_INSTALLMENTS') || !Configuration::deleteByName('PAGGI_INTEREST_RATE') || !Configuration::deleteByName('PAGGI_API_KEY_PRODUCTION') || !Configuration::deleteByName('PAGGI_API_KEY_STAGING') || !Configuration::deleteByName('PAGGI_ENVIRONMENT') || !Configuration::deleteByName('PAGGI_IMG') || !Configuration::deleteByName('PAGGI_STATUS_APPROVED') || !Configuration::deleteByName('PAGGI_STATUS_DECLINED') || !Configuration::deleteByName('PAGGI_STATUS_REGISTERED') || !Configuration::deleteByName('PAGGI_STATUS_PRE_APPROVED') || !Configuration::deleteByName('PAGGI_STATUS_CLEARED') || !Configuration::deleteByName('PAGGI_STATUS_NOT_CLEARED') || !Configuration::deleteByName('PAGGI_STATUS_MANUAL_CLEARING') || !Configuration::deleteByName('PAGGI_STATUS_CAPTURED') || !Configuration::deleteByName('PAGGI_STATUS_CANCELLED') || !Configuration::deleteByName('PAGGI_STATUS_CHARGEBACK')
         ) {
             return false;
         }
@@ -188,25 +155,91 @@ class Paggi extends PaymentModule
      * @see    http://doc.prestashop.com/display/PS16/Creating+a+payment+module
      * @return PaymentModule::display()
      */
-    public function hookPayment($params)
-    {
+    public function hookPayment($params) {
         if (!$this->active) {
             return;
         }
         if (!$this->checkCurrency($params['cart'])) {
             return;
         }
-        $this_path_ssl = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/';
+        $this_path_ssl = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/';
         $this->smarty->assign(
-            array(
-                'this_path' => $this->_path,
-                'this_path_bw' => $this->_path,
-                'this_path_ssl' => $this_path_ssl,
-                'this_img' => $this->getPaggiImage(),
-            )
+                array(
+                    'this_path' => $this->_path,
+                    'this_path_bw' => $this->_path,
+                    'this_path_ssl' => $this_path_ssl,
+                    'this_img' => $this->getPaggiImage(),
+                )
         );
 
         return $this->display(__FILE__, 'payment.tpl');
+    }
+
+    public function hookPaymentOptions($params) {
+        if (!$this->active) {
+            return;
+        }
+
+        if (!$this->checkCurrency($params['cart'])) {
+            return;
+        }
+
+        $payment_options = [
+            $this->getEmbeddedPaymentOption($params),
+        ];
+
+        return $payment_options;
+    }
+
+    public function getEmbeddedPaymentOption($params) {
+        $embeddedOption = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+        $embeddedOption->setCallToActionText($this->l('Payment by credit card'))
+                ->setForm($this->generateForm($params))
+                ->setAction($this->context->link->getModuleLink($this->name, 'validation17', array(), true))
+                ->setAdditionalInformation($this->context->smarty->fetch('module:paggi/views/templates/front/payment_infos.tpl'))
+                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/' . $this->getPaggiImage()));
+
+        return $embeddedOption;
+    }
+
+    protected function generateForm($params) {
+
+
+        if (!empty($this->key)) {
+            $cart = $params['cart'];
+
+            $customer = new Customer($cart->id_customer);
+
+            $cpf = $this->getCPF($customer->id);
+
+
+            if (empty($cpf)) {
+
+                $this->errors[] = Tools::displayError($this->l('CPF is empty.'));
+
+                return $this->context->smarty->fetch('module:paggi/views/templates/front/not_config.tpl');
+            }
+
+            $paggiCustomer = PaggiCustomer::getLoadByCustomerPS($customer, $cpf);
+
+
+            $this->context->smarty->assign(array(
+                'paggiCustomer' => $paggiCustomer,
+                'nbProducts' => $cart->nbProducts(),
+                'cust_currency' => $cart->id_currency,
+                'currencies' => $this->getCurrency((int) $cart->id_currency),
+                'total' => $cart->getOrderTotal(true, Cart::BOTH),
+                'this_path' => $this->getPathUri(),
+                'this_path_bw' => $this->getPathUri(),
+                'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
+                'this_img' => $this->getPaggiImage(),
+                'select_sales' => $this->getPaymentInstallments($cart->getOrderTotal(true, Cart::BOTH))
+            ));
+
+            return $this->context->smarty->fetch('module:paggi/views/templates/front/payment_form.tpl');
+        } else {
+            return $this->context->smarty->fetch('module:paggi/views/templates/front/not_config.tpl');
+        }
     }
 
     /**
@@ -217,8 +250,7 @@ class Paggi extends PaymentModule
      * @see    http://doc.prestashop.com/display/PS16/Creating+a+payment+module
      * @return PaymentModule::display()
      */
-    public function hookPaymentReturn($params)
-    {
+    public function hookPaymentReturn($params) {
         if (!$this->active) {
             return;
         }
@@ -226,84 +258,97 @@ class Paggi extends PaymentModule
             return;
         }
 
-        
-        $orderState = $params['objOrder']->getCurrentOrderState();
+
+
+        if ($this->isPS17()) {
+
+            $order = $params['order'];
+            $total_paid = Tools::displayPrice($order->total_paid);
+        } else {
+            $order = $params['objOrder'];
+            $total_paid = Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false);
+        }
+
+        $orderState = $order->getCurrentOrderState();
 
         if ($orderState->id != Configuration::get('PS_OS_ERROR')) {
             $this->smarty->assign(array(
-              'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
-              'status' => 'ok',
-              'id_order' => $params['objOrder']->id,
-              'orderState' => $orderState
+                'total_to_pay' => $total_paid,
+                'status' => 'ok',
+                'id_order' => $order->id,
+                'orderState' => $orderState,
+                'shop_name' => Configuration::get('PS_SHOP_NAME')
             ));
 
-            if (isset($params['objOrder']->reference) && !empty($params['objOrder']->reference)) {
-                $this->smarty->assign('reference', $params['objOrder']->reference);
+            if (isset($order->reference) && !empty($order->reference)) {
+                $this->smarty->assign('reference', $order->reference);
             }
         } else {
 
-          //condition for return message, where status 'ok' or 'failed'
+            //condition for return message, where status 'ok' or 'failed'
             $this->smarty->assign('status', 'failed');
         }
 
-       
+
 
         return $this->display(__FILE__, 'payment_return.tpl');
     }
 
+    public function display($file, $dir, $cache = null, $content_id = null) {
+        if ($this->isPS17()) {
+
+            return $this->fetch('module:paggi/views/templates/hook/' . $dir);
+        }
+
+        return parent::display($file, $dir, $cache, $content_id);
+    }
 
     /**
-    * hook executed after changing purchase status
-    *
-    * @param Object $params dataParams
-    *
-    * @return void
-    */
-     public function hookActionOrderHistoryAddAfter($params)
-    {
+     * hook executed after changing purchase status
+     *
+     * @param Object $params dataParams
+     *
+     * @return void
+     */
+    public function hookActionOrderHistoryAddAfter($params) {
         $orderHistory = $params['order_history'];
 
         $order = new Order($orderHistory->id_order);
 
         $orderPayment = $order->getOrderPayments();
 
-        try{
+        try {
 
             $charge = \Paggi\Charge::findById($orderPayment[0]->transaction_id);
 
-            $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge->status));
-        
+            $new_status = (int) Configuration::get('PAGGI_STATUS_' . strtoupper($charge->status));
+
             if (Configuration::get('PAGGI_STATUS_CAPTURED') == $orderHistory->id_order_state && $charge->status == 'manual_clearing') {
                 $charge_captured = $charge->capture();
 
-                $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_captured->status));
-            } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state 
-                && ($charge->status == 'manual_clearing' || $charge->status == 'approved') ) {
-                
-                $charge_cancel = $charge->cancel();
-                $new_status = (int) Configuration::get('PAGGI_STATUS_'.strtoupper($charge_cancel->status));
-            }
+                $new_status = (int) Configuration::get('PAGGI_STATUS_' . strtoupper($charge_captured->status));
+            } elseif (Configuration::get('PAGGI_STATUS_CANCELLED') == $orderHistory->id_order_state && ($charge->status == 'manual_clearing' || $charge->status == 'approved')) {
 
-        }catch(\Paggi\PaggiException $ex){
+                $charge_cancel = $charge->cancel();
+                $new_status = (int) Configuration::get('PAGGI_STATUS_' . strtoupper($charge_cancel->status));
+            }
+        } catch (\Paggi\PaggiException $ex) {
 
             $this->adminDisplayWarning($this->l('Internal error.'));
 
             PrestaShopLogger::addLog($ex->getMessage());
 
-            $new_status = (int) Configuration::get('PS_OS_ERROR');     
-
-           
+            $new_status = (int) Configuration::get('PS_OS_ERROR');
         }
 
-        
-        $orderHistory->id_order_state  = (int) $new_status;
+
+        $orderHistory->id_order_state = (int) $new_status;
 
         if ($orderHistory->update()) {
             $order->current_state = $orderHistory->id_order_state;
             $order->update();
-        }       
+        }
     }
-
 
     /**
      * Check permission Currency.
@@ -312,8 +357,7 @@ class Paggi extends PaymentModule
      *
      * @return bool
      */
-    public function checkCurrency($cart)
-    {
+    public function checkCurrency($cart) {
         $currency_order = new Currency((int) ($cart->id_currency));
         $currencies_module = $this->getCurrency((int) $cart->id_currency);
 
@@ -335,13 +379,12 @@ class Paggi extends PaymentModule
      *
      * @return Array
      */
-    public function getPaymentInstallments($amount)
-    {
+    public function getPaymentInstallments($amount) {
         $select = array();
 
         $free_installments = empty(Configuration::get("PAGGI_FREE_INSTALLMENTS")) ? 1 : Configuration::get("PAGGI_FREE_INSTALLMENTS");
-        $max_installments =  empty(Configuration::get("PAGGI_MAX_INSTALLMENTS")) ? 12 : Configuration::get("PAGGI_MAX_INSTALLMENTS");
-        $interest_rate =  empty(Configuration::get("PAGGI_INTEREST_RATE")) ? 0 : Configuration::get("PAGGI_INTEREST_RATE");
+        $max_installments = empty(Configuration::get("PAGGI_MAX_INSTALLMENTS")) ? 12 : Configuration::get("PAGGI_MAX_INSTALLMENTS");
+        $interest_rate = empty(Configuration::get("PAGGI_INTEREST_RATE")) ? 0 : Configuration::get("PAGGI_INTEREST_RATE");
 
         for ($x = 1; $x <= $max_installments; $x++) {
             if ($x > $free_installments) {
@@ -350,13 +393,13 @@ class Paggi extends PaymentModule
                 $amount_new = $amount;
             }
 
-            $installment_amount =  $amount_new / $x;
+            $installment_amount = $amount_new / $x;
 
             $option = array(
-            "installment" => $x,
-            "total" => $amount_new,
-            "installment_amount"=> $installment_amount
-          );
+                "installment" => $x,
+                "total" => $amount_new,
+                "installment_amount" => $installment_amount
+            );
 
             array_push($select, $option);
         }
@@ -365,33 +408,28 @@ class Paggi extends PaymentModule
         return $select;
     }
 
-
     /**
      * Responsible for uploading Paggi Image
      *
      * @return void
      */
-    protected function uploadImg()
-    {
+    protected function uploadImg() {
         $update_images_values = false;
 
-        if (isset($_FILES['PAGGI_IMG'])
-            && isset($_FILES['PAGGI_IMG']['tmp_name'])
-            && !empty($_FILES['PAGGI_IMG']['tmp_name'])
+        if (isset($_FILES['PAGGI_IMG']) && isset($_FILES['PAGGI_IMG']['tmp_name']) && !empty($_FILES['PAGGI_IMG']['tmp_name'])
         ) {
             if ($error = ImageManager::validateUpload($_FILES['PAGGI_IMG'], 4000000)) {
                 return $error;
             } else {
                 $ext = substr($_FILES['PAGGI_IMG']['name'], strrpos($_FILES['PAGGI_IMG']['name'], '.') + 1);
-                $file_name = 'cartao.'.$ext;
+                $file_name = 'cartao.' . $ext;
 
-                if (!move_uploaded_file($_FILES['PAGGI_IMG']['tmp_name'], dirname(__FILE__).DIRECTORY_SEPARATOR.$file_name)) {
+                if (!move_uploaded_file($_FILES['PAGGI_IMG']['tmp_name'], dirname(__FILE__) . DIRECTORY_SEPARATOR . $file_name)) {
                     return $this->displayError($this->l('An error occurred while sending the file.'));
                 } else {
-                    if (Configuration::hasContext('PAGGI_IMG', null, Shop::getContext())
-                        && Configuration::get('PAGGI_IMG') != $file_name
+                    if (Configuration::hasContext('PAGGI_IMG', null, Shop::getContext()) && Configuration::get('PAGGI_IMG') != $file_name
                     ) {
-                        @unlink(dirname(__FILE__).DIRECTORY_SEPARATOR.Configuration::get('PAGGI_IMG'));
+                        @unlink(dirname(__FILE__) . DIRECTORY_SEPARATOR . Configuration::get('PAGGI_IMG'));
                     }
 
                     $values['PAGGI_IMG'] = $file_name;
@@ -411,8 +449,7 @@ class Paggi extends PaymentModule
      *
      * @return void
      */
-    protected function postProcess()
-    {
+    protected function postProcess() {
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('PAGGI_DOCUMENT_FIELD', Tools::getValue('PAGGI_DOCUMENT_FIELD'));
             Configuration::updateValue('PAGGI_FREE_INSTALLMENTS', Tools::getValue('PAGGI_FREE_INSTALLMENTS'));
@@ -432,53 +469,49 @@ class Paggi extends PaymentModule
             Configuration::updateValue('PAGGI_STATUS_CANCELLED', Tools::getValue('PAGGI_STATUS_CANCELLED'));
             Configuration::updateValue('PAGGI_STATUS_CHARGEBACK', Tools::getValue('PAGGI_STATUS_CHARGEBACK'));
             Configuration::updateValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED'));
-            Configuration::updateValue('PAGGI_CPF_FIELD_TABLE_MAPPED' , Tools::getValue('PAGGI_CPF_FIELD_TABLE_MAPPED' ));
-            Configuration::updateValue('PAGGI_CPF_FIELD_COLUMN_MAPPED' , Tools::getValue('PAGGI_CPF_FIELD_COLUMN_MAPPED' ));
+            Configuration::updateValue('PAGGI_CPF_FIELD_TABLE_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_TABLE_MAPPED'));
+            Configuration::updateValue('PAGGI_CPF_FIELD_COLUMN_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_COLUMN_MAPPED'));
             Configuration::updateValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED', Tools::getValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'));
 
 
 
-            if(Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1){
+            if (Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1) {
 
 
                 $this->activeMappedNative();
-
-            }else{
+            } else {
 
                 $this->desactiveMappedNative();
-
             }
 
-    
+
             $this->uploadImg();
         }
         $this->html .= $this->displayConfirmation($this->l('Updated settings.'));
     }
 
-    public function isPS17(){
+    public function isPS17() {
 
         return (version_compare(_PS_VERSION_, '1.7.0.0') >= 0);
     }
 
-    public function activeMappedNative(){
+    public function activeMappedNative() {
 
         $this->desactiveMappedNative();
 
-        $this->registerHook('displayHeader');          
+        $this->registerHook('displayHeader');
 
 
-        if($this->isPS17()){
+        if ($this->isPS17()) {
 
-            if(!file_exists(_PS_OVERRIDE_DIR_.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'form'))
-            {
-              @mkdir(_PS_OVERRIDE_DIR_.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'form', 755);   
+            if (!file_exists(_PS_OVERRIDE_DIR_ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'form')) {
+                @mkdir(_PS_OVERRIDE_DIR_ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'form', 755);
             }
 
-            $this->addOverride("CustomerForm");  
+            $this->addOverride("CustomerForm");
 
             $this->registerHook('additionalCustomerFormFields');
-
-        }else{
+        } else {
 
 
             $this->registerHook('actionCustomerAccountAdd');
@@ -489,12 +522,11 @@ class Paggi extends PaymentModule
 
             $this->addOverride("IdentityController");
 
-            $this->addOverride("AuthController");   
-
+            $this->addOverride("AuthController");
         }
     }
 
-    public function desactiveMappedNative(){
+    public function desactiveMappedNative() {
 
         $this->unregisterHook('displayHeader');
 
@@ -510,19 +542,14 @@ class Paggi extends PaymentModule
 
         $this->unregisterHook('actionCustomerAccountAdd');
 
-        $this->removeOverride("CustomerForm"); 
-
-       
-
+        $this->removeOverride("CustomerForm");
     }
 
-
-    public function cpfValidation($item)
-    {
-        $nulos = array("12345678909","11111111111","22222222222","33333333333",
-            "44444444444","55555555555","66666666666", "77777777777",
+    public function cpfValidation($item) {
+        $nulos = array("12345678909", "11111111111", "22222222222", "33333333333",
+            "44444444444", "55555555555", "66666666666", "77777777777",
             "88888888888", "99999999999", "00000000000");
-        
+
         /* Retira todos os caracteres que nao sejam 0-9 */
         $cpf = preg_replace("/[^0-9]/", "", $item);
 
@@ -533,13 +560,11 @@ class Paggi extends PaymentModule
             throw new Exception($this->l('Only numbers are accepted.'));
         }
 
-        /* Retorna falso se o cpf for nulo*/
+        /* Retorna falso se o cpf for nulo */
         if (in_array($cpf, $nulos)) {
             throw new Exception($this->l('Invalid CPF.'));
         }
-
-       
-        /*Calcula o penúltimo dígito verificador*/
+        /* Calcula o penúltimo dígito verificador */
         $acum = 0;
         for ($i = 0; $i < 9; $i++) {
             $acum += $cpf[$i] * (10 - $i);
@@ -551,7 +576,7 @@ class Paggi extends PaymentModule
         if ($acum != $cpf[9]) {
             throw new Exception($this->l('Invalid CPF. Please verify it and try again.'));
         }
-        /*Calcula o último dígito verificador*/
+        /* Calcula o último dígito verificador */
         $acum = 0;
         for ($i = 0; $i < 10; $i++) {
             $acum += $cpf[$i] * (11 - $i);
@@ -565,69 +590,68 @@ class Paggi extends PaymentModule
         }
     }
 
-
-    public function hookDisplayHeader(){
+    public function hookDisplayHeader() {
 
         $controller_name = Tools::getValue('controller');
+        $context = Context::getContext();
+        $context->controller->addCss($this->_path . '/views/css/fontawesome/css/font-awesome.min.css');
 
+        $context->controller->addJs($this->_path . 'views/js/payment.js');
+        if (in_array($controller_name, array('identity', 'authentication'))) {
 
-
-        if(in_array($controller_name, array('identity', 'authentication'))){
-            $context = Context::getContext();
             $context->controller->addJs($this->_path . 'views/js/jquery.mask.min.js');
             $context->controller->addJs($this->_path . 'views/js/cpf_hook.js');
-        }   
+        }
 
+        if ($controller_name == 'card') {
+            $context->controller->addJs($this->_path . '/views/js/card.js');
+            $context->controller->addJs($this->_path . '/views/js/jquery.card.js');
+            $context->controller->addJs($this->_path . '/views/js/hook_card.js');
+        }
     }
 
-
-    public function hookcreateAccountForm(){
+    public function hookcreateAccountForm() {
 
         return $this->hookDisplayCustomerIdentityForm();
-
     }
 
     /**
-    * Hook for adding Customer Fields
-    *
-    * @param $params
-    *
-    * @return bool
-    */
-    public function hookAdditionalCustomerFormFields(){
+     * Hook for adding Customer Fields
+     *
+     * @param $params
+     *
+     * @return bool
+     */
+    public function hookAdditionalCustomerFormFields() {
 
-         return array(
-
-                (new FormField)
+        return array(
+                    (new FormField)
                     ->setName('cpf')
                     ->setType('text')
                     ->setLabel(
-                        $this->l('CPF')
+                            $this->l('CPF')
                     )
                     ->addAvailableValue('placeholder', '000.000.000-00')
                     ->setRequired(true)
-                
-            );
+        );
     }
 
-
     /**
-    * Hook executed after client's inclusion
-    *
-    * @param $params
-    *
-    * @return bool
-    */
-    public function hookActionCustomerAccountAdd($params)
-    {
+     * Hook executed after client's inclusion
+     *
+     * @param $params
+     *
+     * @return bool
+     */
+    public function hookActionCustomerAccountAdd($params) {
         $postData = $params['_POST'];
 
         $customer = $params['newCustomer'];
 
         $cpf = $postData['cpf'];
-        
-        $numberDoc = preg_replace("/[^0-9]/", "", $cpf);       
-        
+
+        $numberDoc = preg_replace("/[^0-9]/", "", $cpf);
+
         try {
 
             PaggiCustomer::setCPFCustomerPS($customer, $numberDoc);
@@ -637,20 +661,20 @@ class Paggi extends PaymentModule
             return false;
         }
     }
-    public function hookDisplayCustomerIdentityForm(){
 
-        
+    public function hookDisplayCustomerIdentityForm() {
+
+
         $this->context->controller->addJS($this->_path . 'views/js/jquery.mask.min.js');
-     
 
         $cpf = PaggiCustomer::getCPFByCustomerPS($this->context->customer);
 
         $this->smarty->assign(array(
-            'urlValidateDoc' => $this->context->link->getModuleLink('paggi','validatedoc'),
+            'urlValidateDoc' => $this->context->link->getModuleLink('paggi', 'validatedoc'),
             'cpf' => $cpf
         ));
 
-        return $this->display(__FILE__,'blockcpf.tpl');
+        return $this->display(__FILE__, 'blockcpf.tpl');
     }
 
     /**
@@ -658,10 +682,9 @@ class Paggi extends PaymentModule
      *
      * @return string
      */
-    public function getPaggiImage()
-    {
+    public function getPaggiImage() {
         $image = empty(Configuration::get('PAGGI_IMG')) ? 'visa-mastercard.jpg' : Configuration::get('PAGGI_IMG');
-        if (!file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.$image)) {
+        if (!file_exists(dirname(__FILE__) . DIRECTORY_SEPARATOR . $image)) {
             $image = 'visa-mastercard.jpg';
         }
 
@@ -673,8 +696,7 @@ class Paggi extends PaymentModule
      *
      * @return HelperForm
      */
-    public function getContent()
-    {
+    public function getContent() {
         if (Tools::isSubmit('btnSubmit')) {
             $this->postProcess();
         } else {
@@ -691,21 +713,15 @@ class Paggi extends PaymentModule
      *
      * @return HelperForm
      */
-    public function renderForm()
-    {
+    public function renderForm() {
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
 
         //prepare view paggi image temp
         $image_file = $this->getPaggiImage();
         $ext = substr($image_file, strrpos($image_file, '.') + 1);
-        $image = dirname(__FILE__).DIRECTORY_SEPARATOR.$image_file;
+        $image = dirname(__FILE__) . DIRECTORY_SEPARATOR . $image_file;
         $image_url = ImageManager::thumbnail(
-            $image,
-            $this->table.'_'.$this->name.'.'.$image_file,
-            350,
-            strtolower($ext),
-            true,
-            true
+                        $image, $this->table . '_' . $this->name . '.' . $image_file, 350, strtolower($ext), true, true
         );
 
         $fields_form_configuration = array(
@@ -740,25 +756,24 @@ class Paggi extends PaymentModule
                         'required' => false,
                     ),
                     array(
-                      'type' => 'radio',
-                      'label' => $this->l('Select the environment.'),
-                      'name' => 'PAGGI_ENVIRONMENT',
-                      'required' => true,
-                      'class' => 't',
-                      'is_bool' => true,
-
-                      'values' => array(
+                        'type' => 'radio',
+                        'label' => $this->l('Select the environment.'),
+                        'name' => 'PAGGI_ENVIRONMENT',
+                        'required' => true,
+                        'class' => 't',
+                        'is_bool' => true,
+                        'values' => array(
                             array(
-                              'id' => 'active_on',
-                              'value' => 1,
-                              'label' => $this->l('Production'),
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Production'),
                             ),
                             array(
-                              'id' => 'active_off',
-                              'value' => 0,
-                              'label' => $this->l('Development'),
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Development'),
                             ),
-                      ),
+                        ),
                     ),
                 ),
                 'submit' => array(
@@ -775,18 +790,18 @@ class Paggi extends PaymentModule
         $options_status = OrderState::getOrderStates($lang->id);
 
         $fields_form_status = $this->getFieldsFormStatus($options_status);
-        
+
         $helper = new HelperForm();
         $helper->show_toolbar = true;
         $helper->table = $this->table;
-       
+
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
         $this->fields_form = array();
         $helper->id = (int) Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnSubmit';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFieldsValues(),
@@ -794,34 +809,28 @@ class Paggi extends PaymentModule
             'id_language' => $this->context->language->id,
         );
 
-        return $helper->generateForm(array($fields_form_configuration,$fields_form_installments, $fields_form_status, $fields_form_field_mapping));
+        return $helper->generateForm(array($fields_form_configuration, $fields_form_installments, $fields_form_status, $fields_form_field_mapping));
     }
 
-
-
-    public function getCPF($id_customer){
+    public function getCPF($id_customer) {
 
         $cpf = '';
 
-        if(Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1){
+        if (Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED') == 1) {
 
 
             $customer = new Customer($id_customer);
-            $cpf = PaggiCustomer::getCPFByCustomerPS( $customer );
+            $cpf = PaggiCustomer::getCPFByCustomerPS($customer);
+        } else {
 
-        }else{
-
-             if(!empty(Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED')) 
-                && !empty(Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED')) 
-                && !empty(Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'))
-                )
-             {
+            if (!empty(Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED')) && !empty(Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED')) && !empty(Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'))
+            ) {
                 $table_mapped = Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED');
                 $foreingkey_mapped = Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED');
                 $column_mapped = Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED');
 
-                try{
-                    
+                try {
+
                     $db_prefix = _DB_PREFIX_;
                     $sql = "SELECT * FROM `{$db_prefix}{$table_mapped}` WHERE `{$foreingkey_mapped }` = {$id_customer}";
 
@@ -829,24 +838,13 @@ class Paggi extends PaymentModule
 
                     $row = Db::getInstance()->getRow($sql);
 
-                    $cpf = $row[ $column_mapped];
+                    $cpf = $row[$column_mapped];
+                } catch (Exception $ex) {
+                    PrestaShopLogger::addLog($ex->getMessage());
 
-                
-
-                }catch(Exception $ex){
-                   PrestaShopLogger::addLog($ex->getMessage());
-
-                   $this->adminDisplayWarning($this->l('An error occurred during the data mapping in the configuration.'));
-                }           
-
-               
-
-             }
-           
-
-
-
-
+                    $this->adminDisplayWarning($this->l('An error occurred during the data mapping in the configuration.'));
+                }
+            }
         }
 
         return $cpf;
@@ -857,10 +855,8 @@ class Paggi extends PaymentModule
      *
      * @return Array
      */
-    public function getConfigFieldsValues()
-    {
+    public function getConfigFieldsValues() {
         return array(
-
             'PAGGI_DOCUMENT_FIELD' => Tools::getValue('PAGGI_DOCUMENT_FIELD', Configuration::get('PAGGI_DOCUMENT_FIELD')),
             'PAGGI_FREE_INSTALLMENTS' => Tools::getValue('PAGGI_FREE_INSTALLMENTS', Configuration::get('PAGGI_FREE_INSTALLMENTS')),
             'PAGGI_MAX_INSTALLMENTS' => Tools::getValue('PAGGI_MAX_INSTALLMENTS', Configuration::get('PAGGI_MAX_INSTALLMENTS')),
@@ -879,149 +875,137 @@ class Paggi extends PaymentModule
             'PAGGI_STATUS_CAPTURED' => Tools::getValue('PAGGI_STATUS_CAPTURED', Configuration::get('PAGGI_STATUS_CAPTURED')),
             'PAGGI_STATUS_CANCELLED' => Tools::getValue('PAGGI_STATUS_CANCELLED', Configuration::get('PAGGI_STATUS_CANCELLED')),
             'PAGGI_STATUS_CHARGEBACK' => Tools::getValue('PAGGI_STATUS_CHARGEBACK', Configuration::get('PAGGI_STATUS_CHARGEBACK')),
-            'PAGGI_CPF_FIELD_ACTIVED_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED', Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED')) ,
-            'PAGGI_CPF_FIELD_TABLE_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_TABLE_MAPPED', Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED')) ,
-            'PAGGI_CPF_FIELD_COLUMN_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_COLUMN_MAPPED', Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED')) ,
-            'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED', Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED')) 
+            'PAGGI_CPF_FIELD_ACTIVED_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_ACTIVED_MAPPED', Configuration::get('PAGGI_CPF_FIELD_ACTIVED_MAPPED')),
+            'PAGGI_CPF_FIELD_TABLE_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_TABLE_MAPPED', Configuration::get('PAGGI_CPF_FIELD_TABLE_MAPPED')),
+            'PAGGI_CPF_FIELD_COLUMN_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_COLUMN_MAPPED', Configuration::get('PAGGI_CPF_FIELD_COLUMN_MAPPED')),
+            'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED' => Tools::getValue('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED', Configuration::get('PAGGI_CPF_FIELD_FOREING_KEY_MAPPED'))
         );
     }
-
-
 
     /**
      * Load Configuration Status Variables
      *
      * @return Array
      */
-    public function getFieldsFormStatus($options_status)
-    {
+    public function getFieldsFormStatus($options_status) {
         $fields_form_status = array(
-           'form' => array(
+            'form' => array(
                 'legend' => array(
                     'title' => $this->l('Transaction status'),
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
-                  
-                   array(
-                      'type' => 'select',
-                      'label' => $this->l('Approved'),
-                      'desc' => $this->l('Transaction successfully sent to the acquirer.'),
-                      'name' => 'PAGGI_STATUS_APPROVED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
-                    ),
-
-                   array(
-                      'type' => 'select',
-                      'label' => $this->l('Declined'),
-                      'desc' => $this->l('Transaction declined by buyer'),
-                       'name' => 'PAGGI_STATUS_DECLINED',
-                       'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
-                    ),
-                   array(
-                      'type' => 'select',
-                      'label' => $this->l('Registered:'),
-                      'desc' => $this->l('Transaction saved to system but not sent to buyer or risk analysis'),
-                      'name' => 'PAGGI_STATUS_REGISTERED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Approved'),
+                        'desc' => $this->l('Transaction successfully sent to the acquirer.'),
+                        'name' => 'PAGGI_STATUS_APPROVED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
                     ),
                     array(
-                      'type' => 'select',
-                      'label' => $this->l('Pre Approved'),
-                      'desc' => $this->l('Transaction authorized by buyer but not confirmed'),
-                      'name' => 'PAGGI_STATUS_PRE_APPROVED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
+                        'type' => 'select',
+                        'label' => $this->l('Declined'),
+                        'desc' => $this->l('Transaction declined by buyer'),
+                        'name' => 'PAGGI_STATUS_DECLINED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
                     ),
-
                     array(
-                      'type' => 'select',
-                      'label' => $this->l('Approved credit'),
-                      'desc' => $this->l('Transaction authorized by the risk analysis but not sent to the acquirer'),
-                      'name' => 'PAGGI_STATUS_CLEARED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
+                        'type' => 'select',
+                        'label' => $this->l('Registered:'),
+                        'desc' => $this->l('Transaction saved to system but not sent to buyer or risk analysis'),
+                        'name' => 'PAGGI_STATUS_REGISTERED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
                     ),
-
                     array(
-                      'type' => 'select',
-                      'label' => $this->l('At risk'),
-                      'desc' => $this->l('Transaction declined by risk analysis'),
-                      'name' => 'PAGGI_STATUS_NOT_CLEARED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
+                        'type' => 'select',
+                        'label' => $this->l('Pre Approved'),
+                        'desc' => $this->l('Transaction authorized by buyer but not confirmed'),
+                        'name' => 'PAGGI_STATUS_PRE_APPROVED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
                     ),
-
-                     array(
-                      'type' => 'select',
-                      'label' => $this->l('Manual Cleared'),
-                      'desc' => $this->l('Pre-approved transaction for review.'),
-                      'name' => 'PAGGI_STATUS_MANUAL_CLEARING',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
-                    ),
-
-
-                     array(
-                      'type' => 'select',
-                      'label' => $this->l('Captured'),
-                      'desc' => $this->l('Pre-authorized transaction was confirmed with the acquirer'),
-                      'name' => 'PAGGI_STATUS_CAPTURED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
-                    ),
-
                     array(
-                      'type' => 'select',
-                      'label' => $this->l('Cancelled'),
-                      'desc' => $this->l('Request for cancellation was sent to the buyer (confirmation within 7 days)'),
-                      'name' => 'PAGGI_STATUS_CANCELLED',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
+                        'type' => 'select',
+                        'label' => $this->l('Approved credit'),
+                        'desc' => $this->l('Transaction authorized by the risk analysis but not sent to the acquirer'),
+                        'name' => 'PAGGI_STATUS_CLEARED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
                     ),
-
                     array(
-                      'type' => 'select',
-                      'label' => $this->l('Chargeback'),
-                      'desc' => $this->l('Transaction not recognized by cardholder.'),
-                      'name' => 'PAGGI_STATUS_CHARGEBACK',
-                      'options' => array(
-                        'query' => $options_status,
-                        'id' => 'id_order_state',
-                        'name' => 'name'
-                      )
+                        'type' => 'select',
+                        'label' => $this->l('At risk'),
+                        'desc' => $this->l('Transaction declined by risk analysis'),
+                        'name' => 'PAGGI_STATUS_NOT_CLEARED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
                     ),
-                   ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Manual Cleared'),
+                        'desc' => $this->l('Pre-approved transaction for review.'),
+                        'name' => 'PAGGI_STATUS_MANUAL_CLEARING',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Captured'),
+                        'desc' => $this->l('Pre-authorized transaction was confirmed with the acquirer'),
+                        'name' => 'PAGGI_STATUS_CAPTURED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Cancelled'),
+                        'desc' => $this->l('Request for cancellation was sent to the buyer (confirmation within 7 days)'),
+                        'name' => 'PAGGI_STATUS_CANCELLED',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Chargeback'),
+                        'desc' => $this->l('Transaction not recognized by cardholder.'),
+                        'name' => 'PAGGI_STATUS_CHARGEBACK',
+                        'options' => array(
+                            'query' => $options_status,
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        )
+                    ),
+                ),
                 'submit' => array(
                     'title' => $this->l('Save'),
                 )
@@ -1031,68 +1015,59 @@ class Paggi extends PaymentModule
         return $fields_form_status;
     }
 
-
     /**
-    * Load Configuration Installments
-    *
-    * @return Array
-    */
-    public function getFieldsFormInstallments()
-    {
+     * Load Configuration Installments
+     *
+     * @return Array
+     */
+    public function getFieldsFormInstallments() {
         $options = array();
 
-        for($i = 1; $i <= 12; $i ++){
-          array_push($options,   array(
-            'id' => $i,                 // The value of the 'value' attribute of the <option> tag.
-            'name' => $i.' '. $this->l('plots')             // The value of the text content of the  <option> tag.
-          ));
+        for ($i = 1; $i <= 12; $i ++) {
+            array_push($options, array(
+                'id' => $i, // The value of the 'value' attribute of the <option> tag.
+                'name' => $i . ' ' . $this->l('plots')             // The value of the text content of the  <option> tag.
+            ));
         }
 
-       
+
 
         $fields_form_status = array(
-           'form' => array(
+            'form' => array(
                 'legend' => array(
                     'title' => $this->l('Installment Settings'),
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
-
-                           
-                   array(
-                      'type' => 'select', 
-                      'label' => $this->l('Interest free parcelling'),
-                      'desc' => $this->l('Number of installments without interest'),
-                      'name' => 'PAGGI_FREE_INSTALLMENTS',
-                       'options' => array(
-                        'query' => $options,                           // $options contains the data itself.
-                        'id' => 'id',                           // The value of the 'id' key must be the same as the key for 'value' attribute of the <option> tag in each $options sub-array.
-                        'name' => 'name'                               // The value of the 'name' key must be the same as the key for the text content of the <option> tag in each $options sub-array.
-                      )
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Interest free parcelling'),
+                        'desc' => $this->l('Number of installments without interest'),
+                        'name' => 'PAGGI_FREE_INSTALLMENTS',
+                        'options' => array(
+                            'query' => $options, // $options contains the data itself.
+                            'id' => 'id', // The value of the 'id' key must be the same as the key for 'value' attribute of the <option> tag in each $options sub-array.
+                            'name' => 'name'                               // The value of the 'name' key must be the same as the key for the text content of the <option> tag in each $options sub-array.
+                        )
                     ),
-
-                   array(
-                      'type' => 'select',
-                      'label' => $this->l('Maximum number of plots'),
-                      'desc' => $this->l('Maximum number of parcels possible with payment by credit card.'),
-                       'name' => 'PAGGI_MAX_INSTALLMENTS',
-                       
-                         'options' => array(
-                        'query' => $options,                           // $options contains the data itself.
-                        'id' => 'id',                           // The value of the 'id' key must be the same as the key for 'value' attribute of the <option> tag in each $options sub-array.
-                        'name' => 'name'                               // The value of the 'name' key must be the same as the key for the text content of the <option> tag in each $options sub-array.
-                      )
-                     
-                     
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Maximum number of plots'),
+                        'desc' => $this->l('Maximum number of parcels possible with payment by credit card.'),
+                        'name' => 'PAGGI_MAX_INSTALLMENTS',
+                        'options' => array(
+                            'query' => $options, // $options contains the data itself.
+                            'id' => 'id', // The value of the 'id' key must be the same as the key for 'value' attribute of the <option> tag in each $options sub-array.
+                            'name' => 'name'                               // The value of the 'name' key must be the same as the key for the text content of the <option> tag in each $options sub-array.
+                        )
                     ),
-                   array(
-                      'type' => 'text',
-                      'label' => $this->l('Interest Rate'),
-                      'desc' => $this->l('Interest rate value.'),
-                      'name' => 'PAGGI_INTEREST_RATE'
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Interest Rate'),
+                        'desc' => $this->l('Interest rate value.'),
+                        'name' => 'PAGGI_INTEREST_RATE'
                     )
-                   
-                   ),
+                ),
                 'submit' => array(
                     'title' => $this->l('Save'),
                 )
@@ -1102,29 +1077,25 @@ class Paggi extends PaymentModule
         return $fields_form_status;
     }
 
-
     /**
-    * Load Configuration Field Mapping
-    *
-    * @return Array
-    */
-    public function getFieldsFormFieldMapping()
-    {
+     * Load Configuration Field Mapping
+     *
+     * @return Array
+     */
+    public function getFieldsFormFieldMapping() {
         $fields_form_status = array(
-           'form' => array(
+            'form' => array(
                 'legend' => array(
                     'title' => $this->l('Map CPF field'),
                     'icon' => 'icon-cog',
                 ),
                 'input' => array(
-                   
-
                     array(
-                      'type' => 'switch',
-                      'label' => $this->l('Use CPF configuration of Paggi native module.'),
-                      'name' => 'PAGGI_CPF_FIELD_ACTIVED_MAPPED',
-                      'is_bool' => true,
-                      'values' => array(
+                        'type' => 'switch',
+                        'label' => $this->l('Use CPF configuration of Paggi native module.'),
+                        'name' => 'PAGGI_CPF_FIELD_ACTIVED_MAPPED',
+                        'is_bool' => true,
+                        'values' => array(
                             array(
                                 'id' => 'active_on',
                                 'value' => 1,
@@ -1137,27 +1108,23 @@ class Paggi extends PaymentModule
                             )
                         ),
                     ),
-
-                   array(
-                      'type' => 'text',
-                      'label' => $this->l('Name of the table to be mapped'),
-                      'name' => 'PAGGI_CPF_FIELD_TABLE_MAPPED'
-                    ),
-
                     array(
-                      'type' => 'text',
-                      'label' => $this->l('Column to be mapped'),
-                      'name' => 'PAGGI_CPF_FIELD_COLUMN_MAPPED'
+                        'type' => 'text',
+                        'label' => $this->l('Name of the table to be mapped'),
+                        'name' => 'PAGGI_CPF_FIELD_TABLE_MAPPED'
                     ),
-
-                     array(
-                      'type' => 'text',
-                      'label' => $this->l('Foreign key customer'),
-                      'name' => 'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED',
-                      'desc' => $this->l('Foreign key with prestashop id_customer. Ex.: `id_mymodule_customer`')
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Column to be mapped'),
+                        'name' => 'PAGGI_CPF_FIELD_COLUMN_MAPPED'
                     ),
-                   
-                   ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Foreign key customer'),
+                        'name' => 'PAGGI_CPF_FIELD_FOREING_KEY_MAPPED',
+                        'desc' => $this->l('Foreign key with prestashop id_customer. Ex.: `id_mymodule_customer`')
+                    ),
+                ),
                 'submit' => array(
                     'title' => $this->l('Save'),
                 )
@@ -1166,4 +1133,5 @@ class Paggi extends PaymentModule
 
         return $fields_form_status;
     }
+
 }

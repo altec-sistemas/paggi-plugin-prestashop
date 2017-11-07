@@ -24,21 +24,21 @@
 *}
 
 {if $status == 'ok'}
-<p>
-	{l s='Your order on %s is complete.' sprintf=$shop_name mod='paggi'}
-		<br /><br />
-		{l s='The current status of your order is "%s"' sprintf=$orderState->name mod='paggi'}
+    <p>
+        {l s='Your order on %s is complete.'|sprintf:$shop_name mod='paggi'}
+        <br /><br />
+        {l s='The current status of your order is "%s"' sprintf=$orderState->name mod='paggi'}
 
-		<br /><br />- {l s='Amount' mod='paggi'} <span class="price"><strong>{$total_to_pay}</strong></span>
-	
-		{if !isset($reference)}
-			<br /><br />- {l s='The reference number of this purchase is #%d.' sprintf=$id_order mod='paggi'}
-		{/if}		<br /><br />
-		{l s='If you have questions, comments or concerns, please contact our' mod='paggi'} <a href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team' mod='paggi'}</a>.
-	</p>
+        <br /><br />- {l s='Amount' mod='paggi'} <span class="price"><strong>{$total_to_pay}</strong></span>
+
+        {if !isset($reference)}
+            <br /><br />- {l s='The reference number of this purchase is #%d.' sprintf=$id_order mod='paggi'}
+        {/if}		<br /><br />
+        {l s='If you have questions, comments or concerns, please contact our' mod='paggi'} <a href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team' mod='paggi'}</a>.
+    </p>
 {else}
-	<p class="warning">
-		{l s='We noticed a problem with your order. If you think this is an error, feel free to contact our' mod='paggi'} 
-		<a href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team' mod='paggi'}</a>.
-	</p>
+    <p class="warning">
+        {l s='We noticed a problem with your order. If you think this is an error, feel free to contact our' mod='paggi'} 
+        <a href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team' mod='paggi'}</a>.
+    </p>
 {/if}

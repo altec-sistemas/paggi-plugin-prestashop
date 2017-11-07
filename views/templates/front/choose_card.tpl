@@ -27,8 +27,8 @@
 
 
 {capture name=path}
-	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='paggi'}">{l s='Checkout' mod='paggi'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Payment by credit card' mod='paggi'}
-{/capture}
+    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='paggi'}">{l s='Checkout' mod='paggi'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Payment by credit card' mod='paggi'}
+    {/capture}
 
 <h2>{l s='Order summary' mod='paggi'}</h2>
 
@@ -37,213 +37,213 @@
 {include file="$tpl_dir./errors.tpl"}
 
 {if $nbProducts <= 0}
-	<p class="warning">{l s='Your shopping cart is empty.' mod='paggi'}</p>
+    <p class="warning">{l s='Your shopping cart is empty.' mod='paggi'}</p>
 {else}
 
-<p class="alert alert-warning validation_msg" style="display: none"></p>
+    <p class="alert alert-warning validation_msg" style="display: none"></p>
 
-<div class="box">
-	
-	<form class="paggi" action="{$link->getModuleLink('paggi', 'validation', [], true)|escape:'html'}" method="post"  >
-		<div class="row">
+    <div class="box">
 
-			<div class="col-xs-12 col-sm-12">
-				<h3 class="page-subheading">{l s='Payment by credit card' mod='paggi'} - {l s='Choose the card to use' mod='paggi'}</h3>
+        <form class="paggi" action="{$link->getModuleLink('paggi', 'validation', [], true)|escape:'html'}" method="post"  >
+            <div class="row">
 
-				<div class="form_content clearfix">	
-					<div class="row">
-						<div class="col-xs-12 col-sm-12">
-							<a  href="{$link->getModuleLink('paggi', 'card')|escape:'html'}"
-							class="btn btn-primary button button-small" >
-								<span>
-									{l s='Add Card' mod='paggi'}
-								</span>
-							</a>
-						</div>
-					</div>
+                <div class="col-xs-12 col-sm-12">
+                    <h3 class="page-subheading">{l s='Payment by credit card' mod='paggi'} - {l s='Choose the card to use' mod='paggi'}</h3>
 
-					<div class="row">
-						<div class="col-xs-12 col-sm-8">
-							<div class="table-responsive">
-							  <table class="table">
-								  <thead>
-								  <tr >								  	
-								  	<th style="width: 25%; text-align: center;vertical-align: middle;"> 
-								  		{l s='Card type' mod='paggi'}
-								  	</th>
-								  	<th style="width: 25%; text-align: center;vertical-align: middle;"> {l s='4 latest issues' mod='paggi'}</th>
-								  	<th style="width: 30%; text-align: center;vertical-align: middle;"> {l s='Expiration' mod='paggi'}</th>						  	
-								  	
-								  	</tr>
-								  </thead>
+                    <div class="form_content clearfix">	
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-12">
+                                <a  href="{$link->getModuleLink('paggi', 'card')|escape:'html'}"
+                                    class="btn btn-primary button button-small" >
+                                    <span>
+                                        {l s='Add Card' mod='paggi'}
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
 
-								  <tbody>
-								  {if count($paggiCustomer->cards) > 0}
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-8">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr >								  	
+                                                <th style="width: 25%; text-align: center;vertical-align: middle;"> 
+                                                    {l s='Card type' mod='paggi'}
+                                                </th>
+                                                <th style="width: 25%; text-align: center;vertical-align: middle;"> {l s='4 latest issues' mod='paggi'}</th>
+                                                <th style="width: 30%; text-align: center;vertical-align: middle;"> {l s='Expiration' mod='paggi'}</th>						  	
 
-									  {foreach from=$paggiCustomer->cards item=card}
-									  
-									  	<tr style="cursor: pointer;" class="card">
-									  		
-									  		<td style="font-size: 18px; text-align: center">
-									  		<label for="{$card['id']}">
-									  			
-									  		
-									  			<input type="radio" id="{$card['id']}"  name="PAGGI_CHOOSE_CARD_ID" value="{$card['id']}">
-									  		<img  width="50" src="https://online.paggi.com/images/{$card['brand']|lower}.png" />
-									  		</label>
-									  		</td>
-									  		<td style="font-size: 15px; text-align: center">•••• •••• •••• {$card['last4']}</td>
-									  		<td style="font-size: 15px; text-align: center">{$card['month']|str_pad:2:'0':$smarty.const.STR_PAD_LEFT} / {$card['year']}</td>
+                                            </tr>
+                                        </thead>
 
-									  		<td>
-									  			<a  href="#"
-									  			data-id="{$card['id']}"
-												class="btn btn-primary button button-small delete" >
-												<span class="icon icon-trash" aria-hidden="true"></span>
-												</a>
-									  		</td>
-									  		
-									  		
-									  	</tr>
-									  {/foreach}
+                                        <tbody>
+                                            {if count($paggiCustomer->cards) > 0}
 
-								  {/if}
-								  </tbody>
-							  </table>
-							</div>
-						</div>
-						<div class="col-xs-8 col-sm-4">
-								<div class="row">
-						
-									{assign var='sale_message' value={l s='%sx de %s - Total: %s' mod='paggi'}}
-									{assign var='sale_message_in_cast' value={l s='In cast - Total: %s' mod='paggi'}}
-									<div class="col-xs-12 col-sm-12">
-										<div class="form-group">
-											<label for="installments">{l s='Number of installments' mod='paggi'}</label>
-											<select 
-											id="installments" 
-											class="form-control" 
-											name="PAGGI_NUMBER_INSTALLMENT" >
+                                                {foreach from=$paggiCustomer->cards item=card}
 
-											{foreach from=$select_sales item=sale}
+                                                    <tr style="cursor: pointer;" class="card">
 
-												{if $sale.installment == 1}
-
-													<option value="{$sale.installment}">
-														{$sale_message_in_cast|sprintf : {convertPrice price=$sale.total|floatval} }
-														
-													</option>
-
-												{else}
-
-													<option value="{$sale.installment}">
-														{$sale_message|sprintf : $sale.installment : {convertPrice price=$sale.installment_amount|floatval} : {convertPrice price=$sale.total|floatval} }
-													</option>
-
-												{/if}
-												
-											
-											{/foreach}
-												
-											</select>
-											
-										</div>
-									</div>
-										
-
-								</div>
-							
-						</div>
-					</div>
-
-					
-				</div>
-			</div>
-
-			
-		</div>
-	
-	
-
-		<div class="row">
-			<div class="col-xs-12 col-sm-12">
-				<div class="submit">
-
-					<button 
-					class="btn btn-success button button-medium " 
-					type="submit" 
-					name="PAGGI_TASK" 
-					value="PAGGI_CONFIRMED">
-						<span>
-							{l s='I confirm my order' mod='paggi'}
-						</span>
-					</button>
-
-					
+                                                        <td style="font-size: 18px; text-align: center">
+                                                            <label for="{$card['id']}">
 
 
-					<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="btn btn-default button button-medium exclusive">
-						<span>
-							{l s='Other payment methods' mod='paggi'}
-						</span>
-					</a>
-				</div>
-			</div>
-		</div>
-	</form>
-	
-</div>
+                                                                <input type="radio" id="{$card['id']}"  name="PAGGI_CHOOSE_CARD_ID" value="{$card['id']}">
+                                                                <img  width="50" src="https://online.paggi.com/images/{$card['brand']|lower}.png" />
+                                                            </label>
+                                                        </td>
+                                                        <td style="font-size: 15px; text-align: center">•••• •••• •••• {$card['last4']}</td>
+                                                        <td style="font-size: 15px; text-align: center">{$card['month']|str_pad:2:'0':$smarty.const.STR_PAD_LEFT} / {$card['year']}</td>
 
-<script type="text/javascript">
-   
-   var endpointDeleteCard = "{$link->getModuleLink('paggi', 'card')}";
-
-   var methodPaymentMessage = "{l s='Select the card for payment!' mod='paggi'}"
-
-    {literal}
+                                                        <td>
+                                                            <a  href="#"
+                                                                data-id="{$card['id']}"
+                                                                class="btn btn-primary button button-small delete" >
+                                                                <span class="icon icon-trash" aria-hidden="true"></span>
+                                                            </a>
+                                                        </td>
 
 
-    	$("form").find(".delete").click(function(e){
+                                                    </tr>
+                                                {/foreach}
 
-    		e.preventDefault();
-    		
-    		var tag = this;
-    		var id_card = $(tag).data("id");
+                                            {/if}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-xs-8 col-sm-4">
+                                <div class="row">
 
-    		$.post(endpointDeleteCard, {PAGGI_TASK_CARD:"DELETE_CARD", PAGGI_CARD_ID: id_card},
-    			function(data){
+                                    {assign var='sale_message' value={l s='%sx de %s - Total: %s' mod='paggi'}}
+                                    {assign var='sale_message_in_cast' value={l s='In cast - Total: %s' mod='paggi'}}
+                                    <div class="col-xs-12 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="installments">{l s='Number of installments' mod='paggi'}</label>
+                                            <select 
+                                                id="installments" 
+                                                class="form-control" 
+                                                name="PAGGI_NUMBER_INSTALLMENT" >
 
-    				
-    				if(data.status){
-    					$(tag).parent().parent().remove();
-    				}
+                                                {foreach from=$select_sales item=sale}
 
-    				$(".validation_msg").html(data.message).show();
-    			}
-    		)	
+                                                    {if $sale.installment == 1}
 
-    	});
+                                                        <option value="{$sale.installment}">
+                                                            {$sale_message_in_cast|sprintf : {convertPrice price=$sale.total|floatval} }
 
-    	$("form").submit(function(){
+                                                        </option>
 
-    			if($(this).find("input[name=PAGGI_CHOOSE_CARD_ID]:checked").length == 0){
+                                                    {else}
 
-    					$(".validation_msg").html( methodPaymentMessage ).show();
+                                                        <option value="{$sale.installment}">
+                                                            {$sale_message|sprintf : $sale.installment : {convertPrice price=$sale.installment_amount|floatval} : {convertPrice price=$sale.total|floatval} }
+                                                        </option>
 
-    				return false;
-    			}
-
-    	});
-    		
-    	$(".card").click(function(){
-    		$(".validation_msg").hide();
-    		$(this).find("input[name=PAGGI_CHOOSE_CARD_ID]").prop( "checked" , true).attr('checked','checked');
-    			$.uniform.update();
-    	});
+                                                    {/if}
 
 
-    {/literal}
-</script>
+                                                {/foreach}
+
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12">
+                    <div class="submit">
+
+                        <button 
+                            class="btn btn-success button button-medium " 
+                            type="submit" 
+                            name="PAGGI_TASK" 
+                            value="PAGGI_CONFIRMED">
+                            <span>
+                                {l s='I confirm my order' mod='paggi'}
+                            </span>
+                        </button>
+
+
+
+
+                        <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" class="btn btn-default button button-medium exclusive">
+                            <span>
+                                {l s='Other payment methods' mod='paggi'}
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <script type="text/javascript">
+
+        var endpointDeleteCard = "{$link->getModuleLink('paggi', 'card')}";
+
+        var methodPaymentMessage = "{l s='Select the card for payment!' mod='paggi'}"
+
+        {literal}
+
+
+            $("form").find(".delete").click(function (e) {
+
+                e.preventDefault();
+
+                var tag = this;
+                var id_card = $(tag).data("id");
+
+                $.post(endpointDeleteCard, {PAGGI_TASK_CARD: "DELETE_CARD", PAGGI_CARD_ID: id_card},
+                        function (data) {
+
+
+                            if (data.status) {
+                                $(tag).parent().parent().remove();
+                            }
+
+                            $(".validation_msg").html(data.message).show();
+                        }
+                )
+
+            });
+
+            $("form").submit(function () {
+
+                if ($(this).find("input[name=PAGGI_CHOOSE_CARD_ID]:checked").length == 0) {
+
+                    $(".validation_msg").html(methodPaymentMessage).show();
+
+                    return false;
+                }
+
+            });
+
+            $(".card").click(function () {
+                $(".validation_msg").hide();
+                $(this).find("input[name=PAGGI_CHOOSE_CARD_ID]").prop("checked", true).attr('checked', 'checked');
+                $.uniform.update();
+            });
+
+
+        {/literal}
+    </script>
 
 
 

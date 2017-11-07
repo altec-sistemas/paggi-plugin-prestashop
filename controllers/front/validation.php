@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2016 PrestaShop
  *
@@ -27,7 +28,6 @@
  * @link        https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -42,17 +42,16 @@ if (!defined('_PS_VERSION_')) {
  *           Academic Free License (AFL 3.0)
  * @link     https://github.com/paggi-com/plugin-prestashop.git
  */
+class PaggiValidationModuleFrontController extends ModuleFrontController {
 
-class PaggiValidationModuleFrontController extends ModuleFrontController
-{
     /**
      * @see FrontController::postProcess()
      */
-    public function postProcess()
-    {
+    public function postProcess() {
         parent::postProcess();
 
-        if (!Tools::isSubmit('PAGGI_TASK')) {
+
+        if (!Tools::isSubmit('PAGGI_TASK') && !$this->module->isPS17()) {
             return false;
         }
 
@@ -78,7 +77,7 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
-        
+
 
         $card_id = Tools::getValue('PAGGI_CHOOSE_CARD_ID');
         $installments_number = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
@@ -86,7 +85,12 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
         $cpf = $this->module->getCPF($customer->id);
 
         if (empty($card_id) || empty($installments_number) || empty($cpf)) {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+
+            if ($this->module->isPS17()) {
+                Tools::redirect('index.php?controller=order&step=3');
+            } else {
+                Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+            }
         }
 
 
@@ -101,14 +105,14 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
             'card_id' => $card_id,
             'amount' => $price,
             'risk_analysis' => true,
-            'installments_number' =>  $installments_number,
+            'installments_number' => $installments_number,
             'force' => true
         );
 
         try {
             $charge = \Paggi\Charge::create($params);
 
-            $this->module->validateOrder((int)$cart->id, Configuration::get('PAGGI_STATUS_APPROVED'), $total, $this->module->displayName, null, array("transaction_id"=> $charge->id), (int)$currency->id, false, $customer->secure_key);
+            $this->module->validateOrder((int) $cart->id, Configuration::get('PAGGI_STATUS_APPROVED'), $total, $this->module->displayName, null, array("transaction_id" => $charge->id), (int) $currency->id, false, $customer->secure_key);
         } catch (\Paggi\PaggiException $ex) {
             $message = Tools::jsonDecode($ex->getMessage());
 
@@ -116,11 +120,10 @@ class PaggiValidationModuleFrontController extends ModuleFrontController
                 $this->errors[] = $error->message;
             }
 
-
-
-            $this->module->validateOrder((int)$cart->id, Configuration::get('PS_OS_ERROR'), $total, $this->module->displayName, null, array(), (int)$currency->id, false, $customer->secure_key);
+            $this->module->validateOrder((int) $cart->id, Configuration::get('PS_OS_ERROR'), $total, $this->module->displayName, null, array(), (int) $currency->id, false, $customer->secure_key);
         }
-      
-        Tools::redirect('index.php?controller=order-confirmation&id_cart='.(int)$cart->id.'&id_module='.(int)$this->module->id.'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key);
+
+        Tools::redirect('index.php?controller=order-confirmation&id_cart=' . (int) $cart->id . '&id_module=' . (int) $this->module->id . '&id_order=' . $this->module->currentOrder . '&key=' . $customer->secure_key);
     }
+
 }

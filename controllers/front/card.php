@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2016 PrestaShop
  *
@@ -27,7 +28,6 @@
  * @link        https://github.com/paggi-com/plugin-prestashop.git
  * International Registered Trademark & Property of PrestaShop SA
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -42,11 +42,9 @@ if (!defined('_PS_VERSION_')) {
  *           Academic Free License (AFL 3.0)
  * @link     https://github.com/paggi-com/plugin-prestashop.git
  */
+class PaggiCardModuleFrontController extends ModuleFrontController {
 
-class PaggiCardModuleFrontController extends ModuleFrontController
-{
-    public function postProcess()
-    {
+    public function postProcess() {
         parent::postProcess();
 
         if (!Tools::isSubmit('PAGGI_TASK_CARD')) {
@@ -80,11 +78,11 @@ class PaggiCardModuleFrontController extends ModuleFrontController
         if (Tools::getValue('PAGGI_TASK_CARD') == "DELETE_CARD") {
             $this->ajaxDeleteCard();
         }
-        
+
 
         $card_number = Tools::getValue('PAGGI_CARD_NUMBER');
         $card_alias = Tools::getValue('PAGGI_CARD_ALIAS');
-        $card_expiration = explode("/", Tools::getValue('PAGGI_CARD_EXPIRATE'));      
+        $card_expiration = explode("/", Tools::getValue('PAGGI_CARD_EXPIRATE'));
         $card_cvc = Tools::getValue('PAGGI_CARD_CVC');
         $card_installment = Tools::getValue('PAGGI_NUMBER_INSTALLMENT');
 
@@ -96,20 +94,24 @@ class PaggiCardModuleFrontController extends ModuleFrontController
 
         //params create card
         $params = array(
-          'customer_id' => $paggiCustomer->id,
-          'name' => Configuration::get('PS_SHOP_NAME'),
-          'number' => $card_number,
-          'month' => $card_month ,
-          'year' =>$card_year,
-          'cvc' =>$card_cvc,
-          'card_alias' => $card_alias,
-          'validate' => true
-         );
+            'customer_id' => $paggiCustomer->id,
+            'name' => Configuration::get('PS_SHOP_NAME'),
+            'number' => $card_number,
+            'month' => $card_month,
+            'year' => $card_year,
+            'cvc' => $card_cvc,
+            'card_alias' => $card_alias,
+            'validate' => true
+        );
 
         try {
             $card_paggi = \Paggi\Card::create($params);
 
-            Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+            if ($this->module->isPS17()) {
+                Tools::redirect('index.php?controller=order&step=3');
+            } else {
+                Tools::redirect(Context::getContext()->link->getModuleLink('paggi', 'payment'));
+            }
         } catch (\Paggi\PaggiException $ex) {
             $message = Tools::jsonDecode($ex->getMessage());
 
@@ -118,7 +120,7 @@ class PaggiCardModuleFrontController extends ModuleFrontController
             }
 
 
-           
+
             //die($ex);
         }
     }
@@ -129,8 +131,7 @@ class PaggiCardModuleFrontController extends ModuleFrontController
      * @see FrontController::initContent()
      * @return void
      */
-    public function initContent()
-    {
+    public function initContent() {
         parent::initContent();
 
         $cart = $this->context->cart;
@@ -143,30 +144,33 @@ class PaggiCardModuleFrontController extends ModuleFrontController
             Tools::redirect('index.php?controller=order&step=1');
         }
 
+        if ($this->module->isPS17()) {
+            $this->registerJavascript('card.js', _MODULE_DIR_ . $this->module->name . '/views/js/card.js');
+            $this->registerJavascript('jquery.card.js', _MODULE_DIR_ . $this->module->name . '/views/js/jquery.card.js');
+        } else {
+            $this->addJs(_MODULE_DIR_ . $this->module->name . '/views/js/card.js');
+            $this->addJs(_MODULE_DIR_ . $this->module->name . '/views/js/jquery.card.js');
+        }
 
-        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/card.js');
-        $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/jquery.card.js');
-      
-        
+
+
         $this->displayAddCard();
     }
 
-
-    public function ajaxDeleteCard()
-    {
+    public function ajaxDeleteCard() {
         $id_card = Tools::getValue("PAGGI_CARD_ID");
 
         $card = \Paggi\Card::findById($id_card);
 
         $response = array(
-            "status"=>false,
-            "message"=> $this->module->l('Could not delete credit card.', 'paggi')
+            "status" => false,
+            "message" => $this->module->l('Could not delete credit card.', 'paggi')
         );
 
         if ($card->delete()) {
             $response = array(
-                "status"=>true,
-                "message"=> $this->module->l('Credit card successfully deleted', 'paggi')
+                "status" => true,
+                "message" => $this->module->l('Credit card successfully deleted', 'paggi')
             );
         }
 
@@ -176,20 +180,24 @@ class PaggiCardModuleFrontController extends ModuleFrontController
         $this->ajaxDie($json);
     }
 
-
-    public function displayAddCard()
-    {
+    public function displayAddCard() {
         $cart = $this->context->cart;
         //passed data as parameter to the template
         $this->context->smarty->assign(array(
             'nbProducts' => $cart->nbProducts(),
             'this_path' => $this->module->getPathUri(),
             'this_path_bw' => $this->module->getPathUri(),
-            'this_path_ssl' => Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->module->name.'/',
+            'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->module->name . '/',
             'this_img' => $this->module->getPaggiImage(),
             'errors' => $this->errors
         ));
 
-        $this->setTemplate('add_card.tpl');
+
+        if ($this->module->isPS17()) {
+            $this->setTemplate('module:paggi/views/templates/front/add_card17.tpl');
+        } else {
+            $this->setTemplate('add_card.tpl');
+        }
     }
+
 }
