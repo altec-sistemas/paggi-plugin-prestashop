@@ -508,7 +508,9 @@ class Paggi extends PaymentModule {
         if ($this->isPS17()) {
 
             if (!file_exists(_PS_OVERRIDE_DIR_ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'form')) {
-                @mkdir(_PS_OVERRIDE_DIR_ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'form', 755);
+                $oldumask = umask(0000);
+                @mkdir(_PS_OVERRIDE_DIR_ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'form', 0755);
+                umask($oldumask);
             }
 
             $this->addOverride("CustomerForm");
