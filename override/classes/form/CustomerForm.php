@@ -43,39 +43,29 @@ class CustomerForm extends CustomerFormCore
     }
 
 
-    public function submit(){
-
+     public function submit(){
         $ok = parent::submit();
-
         if($ok){
-
             $cpfField = $this->getField('paggi_cpf');
-
             $numberDoc = preg_replace("/[^0-9]/", "", $cpfField->getValue());
-
             try{
+            
+                $context = Context::getContext();              
+                PaggiCustomer::setCPFCustomerPS($context->customer, $numberDoc);
 
-             PaggiCustomer::setCPFCustomerPS($this->getCustomer(), $numberDoc);
             }catch(Exception $ex){
 
                 $ok = false;
-
                 $cpfField->addError($ex->getMessage());
-
+              
             }
-
-
             if (!$ok) {
                 foreach ($this->customerPersister->getErrors() as $field => $errors) {
                     $this->formFields[$field]->setErrors($errors);
                 }
             }
-
             return $ok;
-
         }
-
-
         return false;
     }
 }

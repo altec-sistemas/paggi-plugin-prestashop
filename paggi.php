@@ -124,7 +124,10 @@ class Paggi extends PaymentModule {
      * @return bool
      */
     public function install() {
-        if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') || !$this->registerHook('actionOrderHistoryAddAfter') || !PaggiCustomer::createTable()
+        if (!parent::install() || !$this->registerHook('payment') 
+            || !$this->registerHook('paymentReturn')
+            || !$this->registerHook('paymentOption') 
+            || !$this->registerHook('actionOrderHistoryAddAfter') || !PaggiCustomer::createTable()
         ) {
             return false;
         }
@@ -597,11 +600,9 @@ class Paggi extends PaymentModule {
         $context->controller->addCss($this->_path . '/views/css/fontawesome/css/font-awesome.min.css');
 
         $context->controller->addJs($this->_path . 'views/js/payment.js');
-        if (in_array($controller_name, array('identity', 'authentication'))) {
-
-            $context->controller->addJs($this->_path . 'views/js/jquery.mask.min.js');
-            $context->controller->addJs($this->_path . 'views/js/cpf_hook.js');
-        }
+        
+        $context->controller->addJs($this->_path . 'views/js/jquery.mask.min.js');
+        $context->controller->addJs($this->_path . 'views/js/cpf_hook.js');
 
         if ($controller_name == 'card') {
             $context->controller->addJs($this->_path . '/views/js/card.js');
