@@ -126,7 +126,7 @@ class Paggi extends PaymentModule {
     public function install() {
         if (!parent::install() || !$this->registerHook('payment') 
             || !$this->registerHook('paymentReturn')
-            || !$this->registerHook('paymentOption') 
+            || !$this->registerHook('paymentOptions') 
             || !$this->registerHook('actionOrderHistoryAddAfter') || !PaggiCustomer::createTable()
         ) {
             return false;
